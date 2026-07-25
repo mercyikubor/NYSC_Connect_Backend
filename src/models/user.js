@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const User = sequelize.define(
   "User",
@@ -68,21 +68,19 @@ const User = sequelize.define(
   },
 );
 //this runs before a new user is created and the password is hashed before saving it to the database
-{
+hooks: {
   beforeCreate: async (user) => {
     if (user.password) {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(user.password, salt);
     }
   };
+  // this runs if a user updates their password,and it hashes the new password before saving it to the database
+  beforeUpdate: async (user) => {
+    if (user.changed("password")) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  };
 }
-
-// this runs if a user updates their password,and it hashes the new password before saving it to the database
-beforeUpdate: async (user) => {
-  if (user.changed("password")) {
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
-  }
-};
-
 export default User;
