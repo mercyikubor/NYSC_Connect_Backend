@@ -23,7 +23,7 @@ const testConnection = async () => {
         await sequelize.authenticate();
         console.log("Successfully connected to the cloud db");
     } catch(error){
-        console.error("Connection Failed");
+        console.error("Connection Failed", error);
     }
 };
 
