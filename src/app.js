@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/corps-member", corpRoutes);
+app.use("/api/corps-member", corpRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({

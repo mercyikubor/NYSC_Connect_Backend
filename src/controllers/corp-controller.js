@@ -44,6 +44,14 @@ export const registerCorpsMember = async (req, res) => {
     });
   } catch (error) {
     await transaction.rollback();
+    // Handle duplicate State Code or Call-Up Number
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(400).json({
+        success: false,
+        message:
+          "A corps member with this State Code or Call-Up Number already exists.",
+      });
+    }
     return res.status(500).json({
       success: false,
       error: error.message,

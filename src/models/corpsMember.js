@@ -40,10 +40,6 @@ const CorpsMember = sequelize.define(
       allowNull: true,
       unique: true,
     },
-    nyscYear: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     ppaName: {
       type: DataTypes.STRING,
       allowNull: true,
