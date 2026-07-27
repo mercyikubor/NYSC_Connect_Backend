@@ -1,7 +1,5 @@
-import { BOOLEAN, DataTypes } from "sequelize";
+import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
-import { type } from "node:os";
-import { timeStamp } from "node:console";
 
 const business = sequelize.define(
     "Business",
@@ -20,7 +18,7 @@ const business = sequelize.define(
             allowNull: false,
         },
         category: {
-            type: DataTypes.ENUM("Resturant", "Super-Market", "FoodStuffs", "Others"),
+            type: DataTypes.ENUM("Restaurant", "Super-Market", "FoodStuffs", "Others"),
             allowNull: false,
         },
         description: {
@@ -40,7 +38,7 @@ const business = sequelize.define(
             allowNull: false,
             validate: {min: -90, max: 90},
         },
-        longitutde: {
+        longitude: {
             type: DataTypes.DECIMAL(11, 8),
             allowNull: false,
             validate: {min: -180, max: 180},
@@ -50,12 +48,12 @@ const business = sequelize.define(
             allowNull: true,
         },
         isOperational: {
-            type: BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: true,
         }
     },
     {
-        timeStamp: true,
+        timestamps: true,
     }
 )
 
