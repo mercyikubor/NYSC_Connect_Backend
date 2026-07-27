@@ -9,6 +9,9 @@ const geocoder = NodeGeocoder({
 });
 
 export const createBusiness = async(req, res) => {
+     console.log("INCOMING HEADERS:", req.headers);
+     console.log("INCOMING BODY:", req.body);
+
     try{
         const {name, category, description, phoneNumber, address, sellerId} = req.body;
         let {longitude, latitude} = req.body;
