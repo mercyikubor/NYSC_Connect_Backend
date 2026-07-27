@@ -31,6 +31,17 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    role: {
+      type: DataTypes.ENUM(
+        "Corps_members",
+        "Landlords",
+        "Alumni",
+        "Business",
+        "Admin",
+      ),
+      allowNull: false,
+      defaultValue: "Corps_members",
+    },
     // Onboarding tracking statuses
     isEmailVerified: {
       type: DataTypes.BOOLEAN,
@@ -39,28 +50,6 @@ const User = sequelize.define(
     isOnboardingComplete: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    },
-    // NYSC Verification (Nullable at first)
-    callUpNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-    },
-    letterUrl: {
-      type: DataTypes.STRING, // For storing the uploaded file link
-      allowNull: true,
-    },
-    batch: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    stream: {
-      type: DataTypes.ENUM("1", "2"),
-      allowNull: true,
-    },
-    stateCode: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
   },
   {
@@ -71,15 +60,13 @@ const User = sequelize.define(
 hooks: {
   beforeCreate: async (user) => {
     if (user.password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(user.password, salt);
+      user.password = await bcrypt.hash(user.password, 10);
     }
   };
   // this runs if a user updates their password,and it hashes the new password before saving it to the database
   beforeUpdate: async (user) => {
     if (user.changed("password")) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(user.password, salt);
+      user.password = await bcrypt.hash(user.password, 10);
     }
   };
 }
