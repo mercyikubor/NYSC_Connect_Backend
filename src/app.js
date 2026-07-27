@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import alumniRoutes from "./routes/alumni.js";
 
 const app = express();
 
@@ -19,7 +20,8 @@ app.get("/", (req, res) => {
   });
 });
 
-// Router paths goes here(Didn't write it cause idk what models to write yet)
+// Router paths
+app.use("/api/alumni", alumniRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({
@@ -35,4 +37,5 @@ app.use((err, req, res, next) => {
     message: "An unexpected internal server error occured.",
   });
 });
+
 export default app;
