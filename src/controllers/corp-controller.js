@@ -6,7 +6,7 @@ export const registerCorpsMember = async (req, res) => {
   try {
     const { userData, corpData } = req.body;
 
-    // Create the parent User account
+    // Create the User account
     const newUser = await User.create(
       {
         fullName: userData.fullName,
@@ -17,8 +17,7 @@ export const registerCorpsMember = async (req, res) => {
       },
       { transaction },
     );
-
-    // Create the child CorpMember profile linked via foreign key
+    // Create the CorpMember profile linked via foreign key
     const newProfile = await CorpsMember.create(
       {
         userId: newUser.id,
@@ -28,11 +27,9 @@ export const registerCorpsMember = async (req, res) => {
         ppaName: corpData.ppaName,
         batch: corpData.batch,
         stream: corpData.stream,
-        nyscYear: corpData.nyscYear,
       },
       { transaction },
     );
-
     await transaction.commit();
     return res.status(201).json({
       success: true,
@@ -59,7 +56,33 @@ export const registerCorpsMember = async (req, res) => {
   }
 };
 
-// Get a specific CorpsMember profile by ID with its User credentials
+// Get all Corps Member profiles with their User credentials
+export const getAllCorpProfiles = async (req, res) => {
+  try {
+    const profiles = await CorpsMember.findAll({
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["email", "role", "createdAt"],
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: profiles.length,
+      data: profiles,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+// Get a specific Corps Member profile by ID with its User credentials
 export const getCorpProfile = async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,14 +95,12 @@ export const getCorpProfile = async (req, res) => {
         },
       ],
     });
-
     if (!profile) {
       return res.status(404).json({
         success: false,
         message: "Corp Member profile not found.",
       });
     }
-
     return res.status(200).json({
       success: true,
       data: profile,
@@ -127,7 +148,6 @@ export const deleteCorpProfile = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Locate the profile to grab the user_id before deletion
     const profile = await CorpsMember.findByPk(id);
     if (!profile) {
       return res.status(404).json({
@@ -135,7 +155,6 @@ export const deleteCorpProfile = async (req, res) => {
         message: "Corp Member profile not found.",
       });
     }
-
     await User.destroy({ where: { id: profile.userId } });
     return res.status(200).json({
       success: true,
