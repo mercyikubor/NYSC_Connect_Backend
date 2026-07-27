@@ -37,7 +37,6 @@ const User = sequelize.define(
         "Landlords",
         "Alumni",
         "Business",
-        "Agent",
         "Admin",
       ),
       allowNull: false,
