@@ -2,96 +2,37 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
-import swaggerUi from "swagger-ui-express";
-
-import { swaggerSpec } from "./config/swagger.js";
-
-
-// Routes
-
-
-
 
 const app = express();
 
-/**
- * ============================
- * Security Middleware
- * ============================
- */
-
-// Secure HTTP headers
 app.use(helmet());
-
-// Enable Cross-Origin Resource Sharing
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "*",
-    credentials: true,
-  })
-);
-
-// Parse Cookies
-app.use(cookieParser());
-
-/**
- * ============================
- * Body Parsers
- * ============================
- */
-
-// Parse JSON
+app.use(cors());
+app.use(morgan("dev"));
 app.use(express.json());
-
-// Parse Form Data
 app.use(express.urlencoded({ extended: true }));
 
-/**
- * ============================
- * Logging
- * ============================
- */
-
-app.use(morgan("dev"));
-
-/**
- * ============================
- * Rate Limiting
- * ============================
- */
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many requests. Please try again later.",
-  },
-});
-
-app.use(apiLimiter);
-
-
-
-app.get("/health", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({
-    success: true,
-    message: "NYSC Connect API is running",
-    timestamp: new Date().toISOString(),
+    status: "success",
+    message: "NYSC Connect Backend API",
+    timestamp: new Date(),
   });
 });
 
+// Router paths goes here(Didn't write it cause idk what models to write yet)
 
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: "fail",
+    message: `The requested path [${req.method}] ${req.originalUrl} was not found`,
+  });
+});
 
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-
-
-
-
-
+app.use((err, req, res, next) => {
+  console.error("Internal application error:", err.stack);
+  res.status(500).json({
+    status: "error",
+    message: "An unexpected internal server error occured.",
+  });
+});
 export default app;
