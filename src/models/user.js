@@ -8,7 +8,7 @@ const User = sequelize.define(
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
-      default: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4,
     },
     // Sign up
     fullName: {
@@ -42,11 +42,20 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: "Corps_members",
     },
-    // Onboarding tracking statuses
+    // Emai Verification
     isEmailVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    emailVerificationOtp: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    emailVerificationOtpExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    // Onboarding Tracking
     isOnboardingComplete: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -54,20 +63,21 @@ const User = sequelize.define(
   },
   {
     timestamps: true,
+    //this runs before a new user is created and the password is hashed before saving it to the database
+    hooks: {
+      beforeCreate: async (user) => {
+        if (user.password) {
+          user.password = await bcrypt.hash(user.password, 10);
+        }
+      },
+      // this runs if a user updates their password,and it hashes the new password before saving it to the database
+      beforeUpdate: async (user) => {
+        if (user.changed("password")) {
+          user.password = await bcrypt.hash(user.password, 10);
+        }
+      },
+    },
   },
 );
-//this runs before a new user is created and the password is hashed before saving it to the database
-hooks: {
-  beforeCreate: async (user) => {
-    if (user.password) {
-      user.password = await bcrypt.hash(user.password, 10);
-    }
-  };
-  // this runs if a user updates their password,and it hashes the new password before saving it to the database
-  beforeUpdate: async (user) => {
-    if (user.changed("password")) {
-      user.password = await bcrypt.hash(user.password, 10);
-    }
-  };
-}
+
 export default User;
