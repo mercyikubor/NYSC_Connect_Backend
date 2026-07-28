@@ -123,14 +123,12 @@ export const updateCorpProfile = async (req, res) => {
       { ppaName, verificationStatus },
       { where: { id } },
     );
-
     if (updatedRowsCount === 0) {
       return res.status(404).json({
         success: false,
         message: "Profile not found or no changes were made.",
       });
     }
-
     return res.status(200).json({
       success: true,
       message: "Corp Member profile updated successfully.",
