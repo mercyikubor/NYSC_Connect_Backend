@@ -39,6 +39,8 @@ export const createBusiness = async(req, res) => {
             longitude = geoResult[0].longitude;
         }
 
+        const imageUrl = req.file ? req.file.path: null;
+
         const newBusiness = await business.create({
             sellerId,
             name,
@@ -47,7 +49,8 @@ export const createBusiness = async(req, res) => {
             address,
             description,
             longitude: parseFloat(longitude),
-            latitude: parseFloat(latitude)
+            latitude: parseFloat(latitude),
+            imageUrl
         });
 
         return res.status(201).json({
