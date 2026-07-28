@@ -3,6 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import corpRoutes from "./routes/corp-routes.js";
+import authRoutes from "./routes/auth-routes.js";
+
 const app = express();
 
 app.use(express.json());
@@ -20,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/corps-member", corpRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({
