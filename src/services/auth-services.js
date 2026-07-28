@@ -1,20 +1,9 @@
 import { User, CorpsMember, sequelize } from "../models/index.js";
-import { sendOnboardingOtpEmail } from "./email.service.js";
+import { sendOnboardingOtpEmail } from "../services/email-services.js";
 
 export const registerCorpsMember = async (data) => {
   try {
-    const {
-      fullName,
-      email,
-      phoneNumber,
-      Password,
-      callUpNumber,
-      stateCode,
-      deploymentState,
-      batch,
-      stream,
-      ppaName,
-    } = data;
+    const { fullName, email, phoneNumber, Password, callUpNumber } = data;
     // check if email already exists
     const existingUser = await User.findOne({
       where: {
@@ -57,12 +46,7 @@ export const registerCorpsMember = async (data) => {
     const newProfile = await CorpsMember.create(
       {
         userId: newUser.id,
-        stateCode,
         callUpNumber,
-        deploymentState,
-        ppaName,
-        batch,
-        stream,
       },
       { transaction },
     );
