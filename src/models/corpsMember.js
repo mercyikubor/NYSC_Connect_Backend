@@ -25,11 +25,11 @@ const CorpsMember = sequelize.define(
     },
     batch: {
       type: DataTypes.ENUM("Batch A", "Batch B", "Batch C"),
-      allowNull: false,
+      allowNull: true,
     },
     stream: {
       type: DataTypes.ENUM("Stream 1", "Stream 2"),
-      allowNull: false,
+      allowNull: true,
     },
     stateOfDeployment: {
       type: DataTypes.STRING,
