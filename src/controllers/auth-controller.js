@@ -8,15 +8,15 @@ export const registerCorpsMemberController = async (req, res) => {
       success: false,
       errors: errors.array(),
     });
-    try {
-      const result = awaitRegisterCorpsMember(req.body);
+  }
+  try {
+    const result = await registerCorpsMember(req.body);
 
-      return res.status(201).json(result);
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    return res.status(201).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
