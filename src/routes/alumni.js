@@ -12,4 +12,5 @@ router.get("/", getAllAlumni);
 // GET /api/alumni/:userId - single alumnus's posting details
 router.get("/:userId", getAlumniById);
 
+
 export default router;

@@ -1,10 +1,18 @@
-import User from "../models/User.js";
-import CorpsMemberProfile from "../models/corpsMembersProfiles-model.js";
+import { User, CorpsMemberProfile } from "../models/index.js";
 
-
-//   Get posting details (state of deployment, state code, NYSC year) for all
-//  users with the "Alumni" role.
-
+/**
+ * Get posting details (state of deployment, state code, NYSC year) for all
+ * users with the "Alumni" role.
+ *
+ * @returns {Promise<Array<{
+ *   userId: string,
+ *   fullName: string,
+ *   email: string,
+ *   stateOfDeployment: string,
+ *   stateCode: string,
+ *   nyscYear: number
+ * }>>}
+ */
 export const getAlumniPostingDetails = async () => {
   const alumni = await User.findAll({
     where: { role: "Alumni" },
@@ -14,7 +22,7 @@ export const getAlumniPostingDetails = async () => {
         model: CorpsMemberProfile,
         as: "profile",
         attributes: ["stateOfDeployment", "stateCode", "nyscYear"],
-        required: true, 
+        required: true, // inner join — skips alumni with no profile record
       },
     ],
   });
@@ -31,6 +39,16 @@ export const getAlumniPostingDetails = async () => {
 
 /**
  * Get posting details for a single Alumni user by ID.
+ *
+ * @param {string} userId
+ * @returns {Promise<{
+ *   userId: string,
+ *   fullName: string,
+ *   email: string,
+ *   stateOfDeployment: string,
+ *   stateCode: string,
+ *   nyscYear: number
+ * }>}
  */
 export const getAlumniPostingDetailsById = async (userId) => {
   if (!userId) {

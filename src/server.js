@@ -7,7 +7,7 @@ const PORT = process.env.PORT;
 const startServer = async () => {
   try {
     console.log("Syncing DB models");
-    await sequelize.sync({ alter: true });
+    await await sequelize.sync();
     console.log("DB models synced successfully");
 
     app.listen(PORT, () => {
