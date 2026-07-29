@@ -27,3 +27,27 @@ export const validateLogin = [
 
   body("password").notEmpty().withMessage("Password is required"),
 ];
+
+export const validatePasswordResetRequest = [
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required.")
+    .isEmail()
+    .withMessage("Please provide a valid email address."),
+];
+
+export const validateResetPassword = [
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required.")
+    .isEmail()
+    .withMessage("Please provide a valid email address."),
+
+  body("otp").notEmpty().withMessage("OTP is required."),
+
+  body("newPassword")
+    .notEmpty()
+    .withMessage("New password is required.")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long."),
+];
