@@ -72,3 +72,35 @@ export const registerCorpsMember = async (data) => {
     throw error;
   }
 };
+// verify email address and update user verification status.
+export const verifyEmail = async (data) => {
+  const { email, otp } = data;
+
+  const user = await User.findOne({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+  if (user.isEmailVerified) {
+    throw new Error("Email is already verified.");
+  }
+  if (user.emailVerificationOtp !== otp) {
+    throw new Error("Invalid OTP.");
+  }
+  if (new Date() > user.emailVerificationOtpExpiresAt) {
+    throw new Error("OTP has expired.");
+  }
+  await user.update({
+    isEmailVerified: true,
+    emailVerificationOtp: null,
+    emailVerificationOtpExpiresAt: null,
+  });
+  return {
+    success: true,
+    message: "Email verified successfully.",
+  };
+};
