@@ -119,7 +119,7 @@ export const updateCorpProfile = async (req, res) => {
     const { id } = req.params;
     const { ppaName, verificationStatus } = req.body;
 
-    const [updatedRowsCount] = await CorpMember.update(
+    const [updatedRowsCount] = await CorpsMember.update(
       { ppaName, verificationStatus },
       { where: { id } },
     );
