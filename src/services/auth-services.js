@@ -1,6 +1,6 @@
 import { User, CorpsMember, sequelize } from "../models/index.js";
 import { sendOnboardingOtpEmail } from "../services/email-services.js";
-
+import bcrypt from "bcrypt";
 export const registerCorpsMember = async (data) => {
   const { fullName, email, phoneNumber, password, callUpNumber } = data;
   // check if email already exists
@@ -102,5 +102,34 @@ export const verifyEmail = async (data) => {
   return {
     success: true,
     message: "Email verified successfully.",
+  };
+};
+
+// Login user
+export const login = async (data) => {
+  const { email, password } = data;
+
+  const user = await User.findOne({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("Invalid email or password.");
+  }
+  if (!user.isEmailVerified) {
+    throw new Error("Please verify your email before logging in.");
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new Error("Invalid email or password.");
+  }
+  return {
+    success: true,
+    message: "Login successful.",
+    data: {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    },
   };
 };
