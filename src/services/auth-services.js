@@ -1,6 +1,7 @@
 import { User, CorpsMember, sequelize } from "../models/index.js";
 import { sendOnboardingOtpEmail } from "../services/email-services.js";
 import bcrypt from "bcrypt";
+import { generateToken } from "../utils/generate-token.js";
 export const registerCorpsMember = async (data) => {
   const { fullName, email, phoneNumber, password, callUpNumber } = data;
   // check if email already exists
@@ -123,9 +124,14 @@ export const login = async (data) => {
   if (!isPasswordValid) {
     throw new Error("Invalid email or password.");
   }
+  const token = generateToken({
+    userId: user.id,
+    role: user.role,
+  });
   return {
     success: true,
     message: "Login successful.",
+    token,
     data: {
       userId: user.id,
       email: user.email,
