@@ -3,11 +3,15 @@ import {
   registerCorpsMemberController,
   verifyEmailController,
   loginController,
+  requestPasswordResetController,
+  resetPasswordController,
 } from "../controllers/auth-controller.js";
 import {
   validateCorpsMemberRegistration,
   verifyEmailValidator,
   validateLogin,
+  validatePasswordResetRequest,
+  validateResetPassword,
 } from "../validators/auth-validators.js";
 import { registerLimiter } from "../middleware/rateLimiter.js";
 import {
@@ -27,6 +31,14 @@ router.post(
 router.post("/verify-email", verifyEmailValidator, verifyEmailController);
 
 router.post("/login", validateLogin, loginController);
+
+router.post(
+  "/password-reset-request",
+  validatePasswordResetRequest,
+  requestPasswordResetController,
+);
+
+router.post("/reset-password", validateResetPassword, resetPasswordController);
 
 //Only corps members
 router.get(
@@ -54,4 +66,9 @@ router.get(
   },
 );
 
+router.post(
+  "/password-reset-request",
+  validatePasswordResetRequest,
+  requestPasswordResetController,
+);
 export default router;

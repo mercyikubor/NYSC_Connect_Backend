@@ -2,6 +2,7 @@ import { User, CorpsMember, sequelize } from "../models/index.js";
 import { sendOnboardingOtpEmail } from "../services/email-services.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generate-token.js";
+import { sendPasswordResetOtpEmail } from "../services/email-services.js";
 export const registerCorpsMember = async (data) => {
   const { fullName, email, phoneNumber, password, callUpNumber } = data;
   // check if email already exists
@@ -138,4 +139,62 @@ export const login = async (data) => {
       role: user.role,
     },
   };
+};
+
+export const requestPasswordReset = async (data) => {
+  const { email } = data;
+
+  const user = await User.findOne({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  // Generate OTP
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // OTP expires in 10 minutes
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  await user.update({
+    passwordResetOtp: otpCode,
+    passwordResetOtpExpiresAt: otpExpiresAt,
+  });
+
+  // Send password reset email
+  const emailResult = await sendPasswordResetOtpEmail(
+    user.email,
+    user.fullName,
+    otpCode,
+  );
+
+  if (!emailResult.success) {
+    throw new Error("Failed to send password reset email.");
+  }
+  return {
+    success: true,
+    message: "Password reset OTP sent successfully.",
+  };
+};
+
+export const resetPassword = async (data) => {
+  const { email, otp, newPassword } = data;
+  const user = await User.findOne({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("User not found.");
+  }
+  if (user.passwordResetOtp !== otp) {
+    throw new Error("Invalid OTP.");
+  }
+  if (newDate() > user.passwordResetOtpExpiresAt) {
+    throw new Error("OTP has TokenExpiredError.");
+  }
+  await user.update({
+    password: newPassword,
+    passwordResetOtp: null,
+    passwordResetOtpExpiresAt: null,
+  });
 };

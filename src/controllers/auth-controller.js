@@ -2,7 +2,10 @@ import {
   registerCorpsMember,
   verifyEmail,
   login,
+  requestPasswordReset,
+  resetPassword,
 } from "../services/auth-services.js";
+
 import { validationResult } from "express-validator";
 
 export const registerCorpsMemberController = async (req, res) => {
@@ -61,6 +64,31 @@ export const loginController = async (req, res) => {
     return res.status(200).json(result);
   } catch (error) {
     return res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const requestPasswordResetController = async (req, res) => {
+  try {
+    const result = await requestPasswordReset(req.body);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const resetPasswordController = async (req, res) => {
+  try {
+    const result = await resetPassword(req.body);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
