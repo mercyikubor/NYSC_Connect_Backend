@@ -1,5 +1,5 @@
 import { User, CorpsMember, sequelize } from "../models/index.js";
-import { sendOnboardingOtpEmail } from "../services/email-services.js";
+import { sendOnboardingOtpEmail } from "../utils/email.js";
 
 export const registerCorpsMember = async (data) => {
   try {
