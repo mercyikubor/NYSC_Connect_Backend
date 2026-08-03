@@ -1,7 +1,13 @@
 import { User, CorpsMember, sequelize } from "../models/index.js";
-import { sendOnboardingOtpEmail } from "../services/email-services.js";
+import {
+  sendOnboardingOtpEmail,
+  sendPasswordResetOtpEmail,
+} from "../services/email-services.js";
+import { generateOtp } from "../utils/generate-otp.js";
+import { verifyNYSC } from "../services/prembly-services.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generate-token.js";
+
 export const registerCorpsMember = async (data) => {
   const { fullName, email, phoneNumber, password, callUpNumber } = data;
   // check if email already exists
@@ -22,11 +28,30 @@ export const registerCorpsMember = async (data) => {
   if (existingCorpsMember) {
     throw new Error("Call-up number already exists.");
   }
-  // Generate otp
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  // Generate otp expiry time (10 minutes)
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-  // Start transaction
+  //Real Prembly verification (disabled temporarily because the service is down)
+  // Mock verification is enabled temporarily because the service is down. Set MOCK_PREMBLY_VERIFICATION to false to disable mock verification.
+  let verificationResult;
+
+  if (process.env.MOCK_PREMBLY_VERIFICATION === "true") {
+    verificationResult = {
+      success: true,
+      message: "Mock NYSC verification successful",
+      data: {
+        verified: true,
+        nysc_number: callUpNumber,
+      },
+    };
+  } else {
+    verificationResult = await verifyNYSC(callUpNumber);
+    if (!verificationResult.success) {
+      throw new Error(
+        verificationResult.message || "NYSC verification failed.",
+      );
+    }
+  }
+  //Generate otp
+  const { otpCode, otpExpiresAt } = generateOtp();
+
   const transaction = await sequelize.transaction();
   try {
     //Create the User account
@@ -47,6 +72,9 @@ export const registerCorpsMember = async (data) => {
       {
         userId: newUser.id,
         callUpNumber,
+        verificationStatus: verificationResult.data.verified
+          ? "VERIFIED"
+          : "REJECTED",
       },
       { transaction },
     );
@@ -73,7 +101,7 @@ export const registerCorpsMember = async (data) => {
     throw error;
   }
 };
-// verify email address and update user verification status.
+// verify email address
 export const verifyEmail = async (data) => {
   const { email, otp } = data;
 
@@ -103,6 +131,42 @@ export const verifyEmail = async (data) => {
   return {
     success: true,
     message: "Email verified successfully.",
+  };
+};
+// Resend verification otp
+export const resendVerificationOtp = async (data) => {
+  const { email } = data;
+
+  const user = await User.findOne({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+  if (user.isEmailVerified) {
+    throw new Error("Email is already verified.");
+  }
+
+  // Generate a new OTP
+  const { otpCode, otpExpiresAt } = generateOtp();
+
+  await user.update({
+    emailVerificationOtp: otpCode,
+    emailVerificationOtpExpiresAt: otpExpiresAt,
+  });
+  const emailResult = await sendOnboardingOtpEmail(
+    user.email,
+    user.fullName,
+    otpCode,
+    user.role,
+  );
+  if (!emailResult.success) {
+    throw new Error("Failed to send verification email.");
+  }
+  return {
+    success: true,
+    message: "Verification OTP sent successfully.",
   };
 };
 
@@ -137,5 +201,63 @@ export const login = async (data) => {
       email: user.email,
       role: user.role,
     },
+  };
+};
+
+export const requestPasswordReset = async (data) => {
+  const { email } = data;
+
+  const user = await User.findOne({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  // Generate OTP for password reset
+  const { otpCode, otpExpiresAt } = generateOtp();
+  await user.update({
+    passwordResetOtp: otpCode,
+    passwordResetOtpExpiresAt: otpExpiresAt,
+  });
+
+  // Send password reset email
+  const emailResult = await sendPasswordResetOtpEmail(
+    user.email,
+    user.fullName,
+    otpCode,
+  );
+
+  if (!emailResult.success) {
+    throw new Error("Failed to send password reset email.");
+  }
+  return {
+    success: true,
+    message: "Password reset OTP sent successfully.",
+  };
+};
+
+export const resetPassword = async (data) => {
+  const { email, otp, newPassword } = data;
+  const user = await User.findOne({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("User not found.");
+  }
+  if (user.passwordResetOtp !== otp) {
+    throw new Error("Invalid OTP.");
+  }
+  if (new Date() > user.passwordResetOtpExpiresAt) {
+    throw new Error("OTP has TokenExpiredError.");
+  }
+  await user.update({
+    password: newPassword,
+    passwordResetOtp: null,
+    passwordResetOtpExpiresAt: null,
+  });
+  return {
+    success: true,
+    message: "Password reset successfully.",
   };
 };

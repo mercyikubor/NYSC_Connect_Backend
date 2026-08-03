@@ -55,6 +55,14 @@ const User = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    passwordResetOtp: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    passwordResetOtpExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     // Onboarding Tracking
     isOnboardingComplete: {
       type: DataTypes.BOOLEAN,
