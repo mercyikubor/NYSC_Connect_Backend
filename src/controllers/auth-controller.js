@@ -1,6 +1,7 @@
 import {
   registerCorpsMember,
   verifyEmail,
+  resendVerificationOtp,
   login,
   requestPasswordReset,
   resetPassword,
@@ -43,6 +44,19 @@ export const verifyEmailController = async (req, res) => {
     return res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const resendVerificationOtpController = async (req, res) => {
+  try {
+    const result = await resendVerificationOtp(req.body);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
       success: false,
       message: error.message,
     });

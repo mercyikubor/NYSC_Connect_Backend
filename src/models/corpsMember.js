@@ -40,6 +40,14 @@ const CorpsMember = sequelize.define(
       allowNull: true,
       unique: true,
     },
+    state: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    lga: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     ppaName: {
       type: DataTypes.STRING,
       allowNull: true,

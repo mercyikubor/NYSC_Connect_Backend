@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  registerCorpsMember,
   getAllCorpProfiles,
   getCorpProfile,
   updateCorpProfile,
@@ -13,27 +12,21 @@ import {
 
 const router = Router();
 
-router.post("/register", registerCorpsMember);
+router.get("/", authenticateUser, authorizeRoles("Admin"), getAllCorpProfiles);
 router.get(
-  "/",
-  authenticateUser,
-  authorizeRoles("Corps_members"),
-  getAllCorpProfiles,
-);
-router.get(
-  "/:id",
+  "/profile",
   authenticateUser,
   authorizeRoles("Corps_members"),
   getCorpProfile,
 );
 router.put(
-  "/:id",
+  "/profile",
   authenticateUser,
   authorizeRoles("Corps_members"),
   updateCorpProfile,
 );
 router.delete(
-  "/:id",
+  "/profile",
   authenticateUser,
   authorizeRoles("Corps_members"),
   deleteCorpProfile,
