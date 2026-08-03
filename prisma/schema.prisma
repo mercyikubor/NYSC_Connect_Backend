@@ -23,21 +23,6 @@ model Businesses {
   updatedAt     DateTime            @db.DateTime(0)
 }
 
-model CorpsMemberProfiles {
-  id                 String                                 @id @db.Char(36)
-  userId             String                                 @unique(map: "userId") @db.Char(36)
-  callUpNumber       String                                 @unique(map: "callUpNumber") @db.VarChar(255)
-  callUpLetterUrl    String?                                @db.VarChar(255)
-  batch              CorpsMemberProfiles_batch
-  stream             CorpsMemberProfiles_stream
-  stateOfDeployment  String?                                @db.VarChar(255)
-  stateCode          String?                                @unique(map: "stateCode") @db.VarChar(255)
-  nyscYear           Int
-  verificationStatus CorpsMemberProfiles_verificationStatus @default(PENDING)
-  createdAt          DateTime                               @db.DateTime(0)
-  updatedAt          DateTime                               @db.DateTime(0)
-  Users              Users                                  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "CorpsMemberProfiles_ibfk_1")
-}
 
 model CorpsMembers {
   id                 String                          @id @db.Char(36)
@@ -68,7 +53,6 @@ model Users {
   updatedAt                     DateTime             @db.DateTime(0)
   emailVerificationOtp          String?              @default("0") @db.VarChar(255)
   emailVerificationOtpExpiresAt DateTime?            @db.DateTime(0)
-  CorpsMemberProfiles           CorpsMemberProfiles?
   CorpsMembers                  CorpsMembers?
 }
 
@@ -85,21 +69,12 @@ enum CorpsMembers_batch {
   Batch_C @map("Batch C")
 }
 
-enum CorpsMemberProfiles_batch {
-  Batch_A @map("Batch A")
-  Batch_B @map("Batch B")
-  Batch_C @map("Batch C")
-}
 
 enum CorpsMembers_stream {
   Stream_1 @map("Stream 1")
   Stream_2 @map("Stream 2")
 }
 
-enum CorpsMemberProfiles_stream {
-  Stream_1 @map("Stream 1")
-  Stream_2 @map("Stream 2")
-}
 
 enum Users_role {
   Corps_members
@@ -107,12 +82,6 @@ enum Users_role {
   Alumni
   Business
   Admin
-}
-
-enum CorpsMemberProfiles_verificationStatus {
-  PENDING
-  VERIFIED
-  REJECTED
 }
 
 enum CorpsMembers_verificationStatus {
