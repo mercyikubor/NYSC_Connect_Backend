@@ -15,11 +15,11 @@ CorpsMember.belongsTo(User, {
 
 // Business Association (One-to-One)
 User.hasOne(Business, {
-  foreignKey: "userId",
+  foreignKey: "sellerId",
 });
 
 Business.belongsTo(User, {
-  foreignKey: "userId",
+  foreignKey: "sellerId",
   as: "user",
 });
 

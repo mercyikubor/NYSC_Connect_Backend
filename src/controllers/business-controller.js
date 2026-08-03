@@ -1,119 +1,97 @@
-import NodeGeocoder from "node-geocoder";
-import { User, Business, sequelize } from "../models/index.js";
+import { Sequelize } from "sequelize";
+import { Business } from "../models/index.js";
+import { fetchNearbyBusinesses } from "../services/overpassService.js";
 
-const geocoder = NodeGeocoder({
-  provider: "openstreetmap",
-});
 
-export const createBusiness = async (req, res) => {
-  console.log("INCOMING HEADERS:", req.headers);
-  console.log("INCOMING BODY:", req.body);
-
-  try {
-    const { name, category, description, phoneNumber, address, sellerId } =
-      req.body;
-    let { longitude, latitude } = req.body;
-
-    if (!latitude || !longitude) {
-      if (!address) {
-        return res.status(400).json({
-          success: false,
-          message: "Provide an address.",
-        });
-      }
-
-      const optimizedAddress = address.toLowerCase().includes("nigeria")
-        ? address
-        : `${address}, Nigeria`;
-
-      const geoResult = await geocoder.geocode(optimizedAddress);
-
-      if (!geoResult || geoResult.length === 0) {
-        return res.status(422).json({
-          success: false,
-          message: "We couldn't locate the address.",
-        });
-      }
-
-      latitude = geoResult[0].latitude;
-      longitude = geoResult[0].longitude;
-    }
-
-    const imageUrl = req.file ? req.file.path : null;
-
-    const newBusiness = await business.create({
-      sellerId,
-      name,
-      category,
-      phoneNumber,
-      address,
-      description,
-      longitude: parseFloat(longitude),
-      latitude: parseFloat(latitude),
-      imageUrl,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "Business registered successfully",
-      data: newBusiness,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-};
-
-// Find the nearest shop to the user
 export const getNearbyBusinessByGps = async (req, res) => {
   try {
-    const { lat, lng, radiusInKm = 5 } = req.query;
-
+    const {
+      lat,
+      lng,
+      category
+    } = req.query;
+    
     if (!lat || !lng) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Missing parameters: App interface must provide raw lng & lat params",
+      return res.status(400).json({ success: false, message: "Latitude and longitude are required."
       });
     }
 
+    const radiusKm = Math.min(
+      Number(req.query.radiusInKm) || 1,
+      5
+    );
+
     const userLat = parseFloat(lat);
     const userLng = parseFloat(lng);
-    const earthRadius = 6371; // KM
-
-    const nearByShops = await business.findAll({
-      where: { isOperational: true },
-      attributes: {
-        include: [
+    const earthRadius = 6371;
+    
+    const whereConditions = { isOperational: true };
+    
+    if(category){
+      whereConditions.category = category;
+    }
+    
+    let businesses = await Business.findAll({
+      where: whereConditions,
+      attributes:{
+        include:[
           [
             Sequelize.literal(
-              `${earthRadius} * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(userLat)) * sin(radians(latitude)))`,
+              `${earthRadius} * acos(
+              cos(radians(${userLat})) *
+              cos(radians(latitude)) *
+              cos(radians(longitude) - radians(${userLng})) +
+              sin(radians(${userLat})) *
+              sin(radians(latitude))
+              )`
             ),
-            "distance",
-          ],
-        ],
+            "distance"
+          ]
+        ]
       },
-      include: [
-        {
-          model: User,
-          as: "sellerInfo",
-          attributes: ["name", "email", "phoneNumber"],
-        },
-      ],
-      having: Sequelize.literal(`distance <= ${parseFloat(radiusInKm)}`),
-      order: Sequelize.literal("distance ASC"),
+      having: Sequelize.literal(
+        `distance <= ${radiusKm}`
+      ),
+      order:[
+        [
+          Sequelize.literal("distance"),
+          "ASC"
+        ]
+      ]
     });
+    
+    if(businesses.length > 0){
+      return res.status(200).json({ success:true, source:"database",
+        count:businesses.length,
+        data:businesses
+      });
+    }
+    
+    const radiusMeters = radiusKm * 1000;
+    const osmBusinesses = await fetchNearbyBusinesses(
+      userLat,
+      userLng,
+      radiusMeters
+    );
+    
+    if(osmBusinesses.length > 0){
+      await Business.bulkCreate(
+        osmBusinesses,
+        { 
+          ignoreDuplicates:true,
+          // individualHooks:true,
+        }
+      );
+    }
     return res.status(200).json({
-      success: true,
-      count: nearByShops.length,
-      data: nearByShops,
+      success:true,
+      source:"openstreetmap",
+      count:osmBusinesses.length,
+      data:osmBusinesses
     });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
+  } catch(error){
+    console.error("Nearby Business Error:", error);
+    return res.status(500).json({ success:false, message:"Unable to fetch nearby businesses", error:error.message
     });
   }
 };

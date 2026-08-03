@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import businessRoutes from "./routes/business.js";
+import businessRoutes from "./routes/business-router.js";
 import corpRoutes from "./routes/corp-routes.js";
 import authRoutes from "./routes/auth-routes.js";
 
