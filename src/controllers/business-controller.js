@@ -1,5 +1,5 @@
 import NodeGeocoder from "node-geocoder";
-import { User, Business, sequelize } from "../models/index.js";
+import { User, sequelize } from "../models/index.js";
 
 const geocoder = NodeGeocoder({
   provider: "openstreetmap",

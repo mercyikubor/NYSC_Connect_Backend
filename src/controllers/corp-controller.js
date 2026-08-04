@@ -1,4 +1,6 @@
 import { User, CorpsMember, sequelize } from "../models/index.js";
+import State from "../models/state.js";
+import LGA from "../models/lga.js";
 
 // Get all Corps Member profiles with their User credentials
 export const getAllCorpProfiles = async (req, res) => {
@@ -127,3 +129,9 @@ export const deleteCorpProfile = async (req, res) => {
     });
   }
 };
+
+const state = await State.findOne({
+  where: { name: "Lagos" },
+  include: [{ model: LGA, as: "lgas" }],
+});
+console.log(state);
