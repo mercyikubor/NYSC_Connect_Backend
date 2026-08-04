@@ -129,17 +129,17 @@ const Business = sequelize.define(
     latitude: {
       type: DataTypes.DECIMAL(10, 8),
       allowNull: false,
-      validate: { 
-        min: -90, 
-        max: 90 
+      validate: {
+        min: -90,
+        max: 90,
       },
     },
     longitude: {
       type: DataTypes.DECIMAL(11, 8),
       allowNull: false,
-      validate: { 
-        min: -180, 
-        max: 180 
+      validate: {
+        min: -180,
+        max: 180,
       },
     },
     imageUrl: {
@@ -168,6 +168,14 @@ const Business = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    featured: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     isOperational: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -178,11 +186,7 @@ const Business = sequelize.define(
       allowNull: false,
     },
     syncStatus: {
-      type: DataTypes.ENUM(
-        "active",
-        "failed",
-        "pending",
-      ),
+      type: DataTypes.ENUM("active", "failed", "pending"),
       defaultValue: "active",
       allowNull: false,
     },

@@ -31,22 +31,26 @@ const CorpsMember = sequelize.define(
       type: DataTypes.ENUM("Stream 1", "Stream 2"),
       allowNull: true,
     },
-    stateOfDeployment: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     stateCode: {
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
     },
-    state: {
-      type: DataTypes.STRING,
+    stateId: {
+      type: DataTypes.UUID,
       allowNull: true,
+      references: {
+        model: "States",
+        key: "id",
+      },
     },
-    lga: {
-      type: DataTypes.STRING,
+    lgaId: {
+      type: DataTypes.UUID,
       allowNull: true,
+      references: {
+        model: "LGAs",
+        key: "id",
+      },
     },
     ppaName: {
       type: DataTypes.STRING,

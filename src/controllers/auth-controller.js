@@ -53,6 +53,13 @@ export const verifyEmailController = async (req, res) => {
 };
 
 export const resendVerificationOtpController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
   try {
     const result = await resendVerificationOtp(req.body);
 
@@ -87,6 +94,13 @@ export const loginController = async (req, res) => {
 };
 
 export const requestPasswordResetController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
   try {
     const result = await requestPasswordReset(req.body);
 
@@ -100,6 +114,13 @@ export const requestPasswordResetController = async (req, res) => {
 };
 
 export const resetPasswordController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
   try {
     const result = await resetPassword(req.body);
     return res.status(200).json(result);
