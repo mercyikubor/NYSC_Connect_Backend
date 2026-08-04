@@ -1,17 +1,17 @@
 import multer from "multer";
 import path from "path";
 
-const callUpStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "src/uploads/callup-letter/");
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
   },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueName + path.extname(file.originalname));
+
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + path.extname(file.originalname);
+    cb(null, uniqueName);
   },
 });
 
-export const uploadCallUpLetter = multer({
-  storage: callUpStorage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
+const upload = multer({ storage });
+
+export default upload;

@@ -42,7 +42,7 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: "Corps_members",
     },
-    // Emai Verification
+    // Email Verification
     isEmailVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

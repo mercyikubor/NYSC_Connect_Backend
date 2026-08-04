@@ -30,6 +30,7 @@ export const getAllCorpProfiles = async (req, res) => {
       data: profiles,
     });
   } catch (error) {
+     console.error(error);
     return res.status(500).json({
       success: false,
       error: error.message,

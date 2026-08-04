@@ -168,6 +168,14 @@ const Business = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    featured: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     isOperational: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -207,7 +215,7 @@ const Business = sequelize.define(
         fields: ["city"],
       },
       {
-        fields: ["featured"],
+        fields: ["featured"]
       },
       {
         fields: ["verified"],
@@ -226,17 +234,17 @@ const Business = sequelize.define(
 );
 
 Business.beforeValidate((business) => {
-  if (business.name) {
+  if(business.name){
     business.searchName = business.name.toLowerCase().trim();
   }
 
-  if (business.name && !business.slug) {
-    const city = business.city ? `-${business.city.toLowerCase()}` : "";
+  if(business.name && !business.slug){
+    const city = business.city? `-${business.city.toLowerCase()}` : "";
 
     business.slug = `${business.name}${city}-${business.osmId}`
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-");
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-");
   }
 });
 
