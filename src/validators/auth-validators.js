@@ -1,21 +1,31 @@
 import { body } from "express-validator";
 
 export const validateCorpsMemberRegistration = [
-  body("fullName").notEmpty().withMessage("Full name is requires"),
+  body("fullName").trim().notEmpty().withMessage("Full name is required"),
 
-  body("email").isEmail().withMessage("Please provide a valid email address"),
+  body("email")
+    .trim()
+    .isEmail()
+    .withMessage("Please provide a valid email address"),
 
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long"),
 
-  body("callUpNumber").notEmpty().withMessage("Call-up number is required"),
+  body("callUpNumber")
+    .trim()
+    .notEmpty()
+    .withMessage("Call-up number is required"),
 ];
 
 export const verifyEmailValidator = [
-  body("email").isEmail().withMessage("Please provide a valid email address"),
+  body("email")
+    .trim()
+    .isEmail()
+    .withMessage("Please provide a valid email address"),
 
   body("otp")
+    .trim()
     .notEmpty()
     .withMessage("OTP is required")
     .isLength({ min: 6, max: 6 })
@@ -24,6 +34,7 @@ export const verifyEmailValidator = [
 
 export const validateResendVerificationOtp = [
   body("email")
+    .trim()
     .notEmpty()
     .withMessage("Email is required.")
     .isEmail()
@@ -31,13 +42,17 @@ export const validateResendVerificationOtp = [
 ];
 
 export const validateLogin = [
-  body("email").isEmail().withMessage("Please provide a valid email address"),
+  body("email")
+    .trim()
+    .isEmail()
+    .withMessage("Please provide a valid email address"),
 
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
 export const validatePasswordResetRequest = [
   body("email")
+    .trim()
     .notEmpty()
     .withMessage("Email is required.")
     .isEmail()
@@ -46,12 +61,13 @@ export const validatePasswordResetRequest = [
 
 export const validateResetPassword = [
   body("email")
+    .trim()
     .notEmpty()
     .withMessage("Email is required.")
     .isEmail()
     .withMessage("Please provide a valid email address."),
 
-  body("otp").notEmpty().withMessage("OTP is required."),
+  body("otp").trim().notEmpty().withMessage("OTP is required."),
 
   body("newPassword")
     .notEmpty()

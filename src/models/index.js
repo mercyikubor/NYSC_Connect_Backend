@@ -1,6 +1,6 @@
 import sequelize from "../config/db.js";
 import User from "./user.js";
-import CorpsMember from "./corpsMember.js
+import CorpsMember from "./corpsMember.js";
 import State from "./state.js";
 import LGA from "./lga.js";
 import Landlord from "./landlord.js";
