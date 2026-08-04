@@ -1,10 +1,11 @@
 import sequelize from "../config/db.js";
 import User from "./user.js";
-import CorpsMember from "./corpsMember.js
+import CorpsMember from "./corpsMember.js";
 import State from "./state.js";
 import LGA from "./lga.js";
 import Landlord from "./landlord.js";
-import Property from "./property.js"
+import Property from "./property.js";
+import Business from "./business.js";
 
 // User -> CorpsMember Association (One-to-One)
 User.hasOne(CorpsMember, {
@@ -48,6 +49,17 @@ CorpsMember.belongsTo(LGA, {
   as: "lga",
 });
 
+
+// User ↔ Business
+User.hasOne(Business, {
+  foreignKey: "sellerId",
+  as: "business",
+});
+
+Business.belongsTo(User, {
+  foreignKey: "sellerId",
+  as: "user",
+});
 // Landlord ↔ Property
 Landlord.hasMany(Property, {
   foreignKey: "landlordId",
@@ -59,4 +71,4 @@ Property.belongsTo(Landlord, {
   foreignKey: "landlordId",
   as: "landlord",
 });
-export { sequelize, User, CorpsMember, State, LGA, Landlord, Property };
+export { sequelize, User, CorpsMember, State, LGA, Business, Landlord, Property };
