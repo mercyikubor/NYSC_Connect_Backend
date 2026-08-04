@@ -2,14 +2,12 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
 const Landlord = sequelize.define('Landlord', {
-  id: {
+    id: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUID4,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-
-  
-  name: {
+  fullName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -22,6 +20,26 @@ const Landlord = sequelize.define('Landlord', {
   phone: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  selfieUrl: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  validIdUrl: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  isVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  verificationStatus: {
+    type: DataTypes.ENUM('PENDING', 'APPROVED', 'REJECTED'),
+    defaultValue: 'PENDING',
   },
 });
 

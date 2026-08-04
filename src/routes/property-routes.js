@@ -1,26 +1,58 @@
-import express from 'express';
+import express from "express";
+import { upload } from "../config/cloudinary.js";
 import {
   createProperty,
   getProperties,
+  getMyProperties,
   getPropertyById,
   updateProperty,
   deleteProperty,
   verifyProperty,
-} from '../controllers/propertyController.js';
-import { upload } from '../config/cloudinary.js';
+} from "../controllers/property-controller.js";
 
+import {
+  authenticateUser,
+  authorizeRoles,
+} from "../middleware/auth-middleware.js";
 const router = express.Router();
+router.get(
+  "/my-properties",
+  authenticateUser,
+  authorizeRoles("Landlords"),
+  getMyProperties
+);
 
-const protect = (req, res, next) => next();
-const authorizeAdmin = (req, res, next) => next();
+router.get("/", getProperties);
 
-router.get('/', getProperties);
-router.get('/:id', getPropertyById);
+router.get("/:id", getPropertyById);
 
-router.post('/', protect, upload.array('images', 5), createProperty);
-router.put('/:id', protect, updateProperty);
-router.delete('/:id', protect, deleteProperty);
+router.post(
+  "/",
+  authenticateUser,
+  authorizeRoles("Landlords"),
+  upload.array("images", 5),
+  createProperty
+);
 
-router.patch('/:id/verify', protect, authorizeAdmin, verifyProperty);
+router.put(
+  "/:id",
+  authenticateUser,
+  authorizeRoles("Landlords"),
+  updateProperty
+);
+
+router.delete(
+  "/:id",
+  authenticateUser,
+  authorizeRoles("Landlords"),
+  deleteProperty
+);
+
+router.patch(
+  "/:id/verify",
+  authenticateUser,
+  authorizeRoles("Admin"),
+  verifyProperty
+);
 
 export default router;

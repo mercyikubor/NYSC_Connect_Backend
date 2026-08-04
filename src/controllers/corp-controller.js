@@ -75,6 +75,7 @@ export const getAllCorpProfiles = async (req, res) => {
       data: profiles,
     });
   } catch (error) {
+     console.error(error);
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -119,7 +120,7 @@ export const updateCorpProfile = async (req, res) => {
     const { id } = req.params;
     const { ppaName, verificationStatus } = req.body;
 
-    const [updatedRowsCount] = await CorpMember.update(
+    const [updatedRowsCount] = await CorpsMember.update(
       { ppaName, verificationStatus },
       { where: { id } },
     );

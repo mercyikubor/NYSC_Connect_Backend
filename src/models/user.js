@@ -42,16 +42,24 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: "Corps_members",
     },
-    // Emai Verification
+    // Email Verification
     isEmailVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
     emailVerificationOtp: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING,
       defaultValue: false,
     },
     emailVerificationOtpExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    passwordResetOtp: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    passwordResetOtpExpiresAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },

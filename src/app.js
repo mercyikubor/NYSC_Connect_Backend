@@ -2,11 +2,15 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import businessRoutes from "./routes/business.js";
 import corpRoutes from "./routes/corp-routes.js";
 import authRoutes from "./routes/auth-routes.js";
+import propertyRoutes from "./routes/property-routes.js";
+import adminRoutes from "./routes/admin-routes.js";
 
 const app = express();
 
+app.use("/api/admin", adminRoutes);
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
@@ -21,8 +25,10 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/api/businesses", businessRoutes);
 app.use("/api/corps-member", corpRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/properties", propertyRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({
@@ -32,10 +38,14 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error("Internal application error:", err.stack);
-  res.status(500).json({
-    status: "error",
-    message: "An unexpected internal server error occured.",
+  console.error(err);
+
+  res.status(err.status || 500).json({
+    success: false,
+    name: err.name,
+    message: err.message,
+    field: err.field,
+    stack: err.stack,
   });
 });
 export default app;

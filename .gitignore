@@ -3,3 +3,4 @@ node_modules/
 
 # OS Build
 .DS_Store
+/src/generated/prisma
