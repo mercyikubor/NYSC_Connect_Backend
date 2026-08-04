@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 
 export const authenticateUser = (req, res, next) => {
   try {
+    console.log("Authorization Header:", req.headers.authorization);
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -10,21 +12,24 @@ export const authenticateUser = (req, res, next) => {
         message: "Authorization token required.",
       });
     }
+
     const token = authHeader.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid authorization format.",
-      });
-    }
+    console.log("Token:", token);
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("Decoded:", decoded);
+
     req.user = decoded;
+
     next();
   } catch (error) {
+    console.error("JWT Error:", error);
+
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token.",
+      message: error.message,
     });
   }
 };

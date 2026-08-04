@@ -1,6 +1,6 @@
 import sequelize from "../config/db.js";
 import User from "./user.js";
-import CorpsMember from "./corpsMember.js";
+import CorpsMember from "./corpsMember.js
 import State from "./state.js";
 import LGA from "./lga.js";
 import Landlord from "./landlord.js";
@@ -48,9 +48,7 @@ CorpsMember.belongsTo(LGA, {
   as: "lga",
 });
 
-export { sequelize, User, CorpsMember, State, LGA };
-
-// Landlord -> Property Association (One-to-Many)
+// Landlord ↔ Property
 Landlord.hasMany(Property, {
   foreignKey: "landlordId",
   as: "properties",
@@ -61,5 +59,4 @@ Property.belongsTo(Landlord, {
   foreignKey: "landlordId",
   as: "landlord",
 });
-
-export { sequelize, User, CorpsMember, Landlord, Property };
+export { sequelize, User, CorpsMember, State, LGA, Landlord, Property };

@@ -5,6 +5,8 @@ import {
   login,
   requestPasswordReset,
   resetPassword,
+  registerLandlord,
+  loginLandlord,
 } from "../services/auth-services.js";
 
 import { validationResult } from "express-validator";
@@ -103,6 +105,35 @@ export const resetPasswordController = async (req, res) => {
     return res.status(200).json(result);
   } catch (error) {
     return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+
+export const registerLandlordController = async (req, res) => {
+  try {
+    const result = await registerLandlord(req.body, req.files);
+
+    return res.status(201).json(result);
+  } catch (error) {
+    console.error("Landlord Signup Error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const loginLandlordController = async (req, res) => {
+  try {
+    const result = await loginLandlord(req.body);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(401).json({
       success: false,
       message: error.message,
     });

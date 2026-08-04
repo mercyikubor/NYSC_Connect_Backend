@@ -20,9 +20,23 @@ const storage = new CloudinaryStorage({
       { width: 600, height: 400, crop: "limit", quality: "auto" },
     ],
   },
+    cloudinary: cloudinary,
+    params: {
+        folder: "nysc-connect/landlord-verification",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
+        transformation: [{ width: 600, height: 400, crop: "limit", quality: "auto"}]
+    }
 });
 
 export const uploadImage = multer({
   storage,
   limits: { fileSize: 3 * 1024 * 1024 },
 });
+
+ const upload = multer({
+    storage: storage,
+    limits: { fileSize: 3 * 1024 * 1024 }
+})
+
+export { cloudinary, upload };
+export default cloudinary;

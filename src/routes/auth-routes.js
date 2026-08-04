@@ -1,11 +1,12 @@
-import express from "express";
 import {
   registerCorpsMemberController,
+  registerLandlordController,
   verifyEmailController,
   resendVerificationOtpController,
   loginController,
   requestPasswordResetController,
   resetPasswordController,
+  loginLandlordController,
 } from "../controllers/auth-controller.js";
 import {
   validateCorpsMemberRegistration,
@@ -27,14 +28,14 @@ import {
   authenticateUser,
   authorizeRoles,
 } from "../middleware/auth-middleware.js";
-
+import express from "express";
+import { upload } from "../config/cloudinary.js";
 const router = express.Router();
-
 router.post(
   "/register/corps-member",
   registerLimiter,
   validateCorpsMemberRegistration,
-  registerCorpsMemberController,
+  registerCorpsMemberController
 );
 
 router.post(
@@ -50,14 +51,40 @@ router.post(
   validateResendVerificationOtp,
   resendVerificationOtpController,
 );
+router.post(
+  "/verify-email",
+  verifyEmailValidator,
+  verifyEmailController
+);
 
 router.post("/login", loginLimiter, validateLogin, loginController);
+router.post(
+  "/login",
+  validateLogin,
+  loginController
+);
+
+router.post(
+  "/register-landlord",
+  registerLimiter,
+  upload.fields([
+    { name: "selfie", maxCount: 1 },
+    { name: "validId", maxCount: 1 },
+  ]),
+  registerLandlordController
+);
+
+router.post(
+  "/login-landlord",
+  validateLogin,
+  loginLandlordController
+);
 
 router.post(
   "/password-reset-request",
   passwordResetRequestLimiter,
   validatePasswordResetRequest,
-  requestPasswordResetController,
+  requestPasswordResetController
 );
 
 router.post(
@@ -66,8 +93,12 @@ router.post(
   validateResetPassword,
   resetPasswordController,
 );
+router.post(
+  "/reset-password",
+  validateResetPassword,
+  resetPasswordController
+);
 
-//Only corps members
 router.get(
   "/corps-dashboard",
   authenticateUser,
@@ -77,10 +108,9 @@ router.get(
       success: true,
       message: "Welcome Corps Member",
     });
-  },
+  }
 );
 
-// Only landlords
 router.get(
   "/landlord-dashboard",
   authenticateUser,
@@ -90,7 +120,7 @@ router.get(
       success: true,
       message: "Welcome Landlord",
     });
-  },
+  }
 );
 
 export default router;
