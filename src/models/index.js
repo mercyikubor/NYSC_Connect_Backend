@@ -4,7 +4,7 @@ import CorpsMember from "./corpsMember.js
 import State from "./state.js";
 import LGA from "./lga.js";
 import Landlord from "./landlord.js";
-import Property from "./property.js";
+import Property from "./property.js"
 
 // User -> CorpsMember Association (One-to-One)
 User.hasOne(CorpsMember, {

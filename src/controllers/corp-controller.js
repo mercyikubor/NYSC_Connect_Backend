@@ -1,4 +1,5 @@
-import { User, CorpsMember, sequelize } from "../models/index.js";
+import { User, CorpsMember, State, LGA } from "../models/index.js";
+import { validationResult } from "express-validator";
 
 // Get all Corps Member profiles with their User credentials
 export const getAllCorpProfiles = async (req, res) => {
@@ -9,6 +10,16 @@ export const getAllCorpProfiles = async (req, res) => {
           model: User,
           as: "user",
           attributes: ["email", "role", "createdAt"],
+        },
+        {
+          model: State,
+          as: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          model: LGA,
+          as: "lga",
+          attributes: ["id", "name"],
         },
       ],
     });
@@ -39,8 +50,19 @@ export const getCorpProfile = async (req, res) => {
           as: "user",
           attributes: ["email", "role", "createdAt"],
         },
+        {
+          model: State,
+          as: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          model: LGA,
+          as: "lga",
+          attributes: ["id", "name"],
+        },
       ],
     });
+
     if (!profile) {
       return res.status(404).json({
         success: false,
@@ -61,18 +83,16 @@ export const getCorpProfile = async (req, res) => {
 
 //   Update  Corps member profile
 export const updateCorpProfile = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
   try {
     const userId = req.user.userId;
-    const {
-      deploymentState,
-      stateCode,
-      batch,
-      stream,
-      state,
-      lga,
-      ppaName,
-      callUpLetterUrl,
-    } = req.body;
+    const { stateCode, batch, stream, stateId, lgaId, ppaName } = req.body;
 
     const profile = await CorpsMember.findOne({ where: { userId } });
     if (!profile) {
@@ -82,14 +102,12 @@ export const updateCorpProfile = async (req, res) => {
       });
     }
     await profile.update({
-      deploymentState,
       stateCode,
       batch,
       stream,
-      state,
-      lga,
+      stateId,
+      lgaId,
       ppaName,
-      callUpLetterUrl,
     });
     return res.status(200).json({
       success: true,
