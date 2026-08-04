@@ -2,6 +2,7 @@ import {
   registerCorpsMemberController,
   registerLandlordController,
   verifyEmailController,
+  resendVerificationOtpController,
   loginController,
   requestPasswordResetController,
   resetPasswordController,
@@ -10,11 +11,19 @@ import {
 import {
   validateCorpsMemberRegistration,
   verifyEmailValidator,
+  validateResendVerificationOtp,
   validateLogin,
   validatePasswordResetRequest,
   validateResetPassword,
 } from "../validators/auth-validators.js";
-import { registerLimiter } from "../middleware/rateLimiter.js";
+import {
+  registerLimiter,
+  verifyLimiter,
+  loginLimiter,
+  resendVerificationLimiter,
+  passwordResetRequestLimiter,
+  passwordResetLimiter,
+} from "../middleware/rateLimiter.js";
 import {
   authenticateUser,
   authorizeRoles,
@@ -31,10 +40,24 @@ router.post(
 
 router.post(
   "/verify-email",
+  verifyLimiter,
+  verifyEmailValidator,
+  verifyEmailController,
+);
+
+router.post(
+  "/resend-verification-otp",
+  resendVerificationLimiter,
+  validateResendVerificationOtp,
+  resendVerificationOtpController,
+);
+router.post(
+  "/verify-email",
   verifyEmailValidator,
   verifyEmailController
 );
 
+router.post("/login", loginLimiter, validateLogin, loginController);
 router.post(
   "/login",
   validateLogin,
@@ -59,10 +82,17 @@ router.post(
 
 router.post(
   "/password-reset-request",
+  passwordResetRequestLimiter,
   validatePasswordResetRequest,
   requestPasswordResetController
 );
 
+router.post(
+  "/reset-password",
+  passwordResetLimiter,
+  validateResetPassword,
+  resetPasswordController,
+);
 router.post(
   "/reset-password",
   validateResetPassword,

@@ -22,6 +22,14 @@ export const verifyEmailValidator = [
     .withMessage("OTP must be 6 digits"),
 ];
 
+export const validateResendVerificationOtp = [
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required.")
+    .isEmail()
+    .withMessage("Please provide a valid email address."),
+];
+
 export const validateLogin = [
   body("email").isEmail().withMessage("Please provide a valid email address"),
 

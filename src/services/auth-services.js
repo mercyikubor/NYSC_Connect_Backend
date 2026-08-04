@@ -1,8 +1,12 @@
-import { User, CorpsMember, Landlord, sequelize } from "../models/index.js";
-import { sendOnboardingOtpEmail } from "../services/email-services.js";
+import { User, CorpsMember, sequelize } from "../models/index.js";
+import {
+  sendOnboardingOtpEmail,
+  sendPasswordResetOtpEmail,
+} from "../services/email-services.js";
+import { generateOtp } from "../utils/generate-otp.js";
+import { verifyNYSC } from "../services/prembly-services.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generate-token.js";
-import { sendPasswordResetOtpEmail } from "../services/email-services.js";
 
 export const registerCorpsMember = async (data) => {
   const { fullName, email, phoneNumber, password, callUpNumber } = data;
@@ -24,11 +28,30 @@ export const registerCorpsMember = async (data) => {
   if (existingCorpsMember) {
     throw new Error("Call-up number already exists.");
   }
-  // Generate otp
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  // Generate otp expiry time (10 minutes)
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-  // Start transaction
+  //Real Prembly verification (disabled temporarily because the service is down)
+  // Mock verification is enabled temporarily because the service is down. Set MOCK_PREMBLY_VERIFICATION to false to disable mock verification.
+  let verificationResult;
+
+  if (process.env.MOCK_PREMBLY_VERIFICATION === "true") {
+    verificationResult = {
+      success: true,
+      message: "Mock NYSC verification successful",
+      data: {
+        verified: true,
+        nysc_number: callUpNumber,
+      },
+    };
+  } else {
+    verificationResult = await verifyNYSC(callUpNumber);
+    if (!verificationResult.success) {
+      throw new Error(
+        verificationResult.message || "NYSC verification failed.",
+      );
+    }
+  }
+  //Generate otp
+  const { otpCode, otpExpiresAt } = generateOtp();
+
   const transaction = await sequelize.transaction();
   try {
     //Create the User account
@@ -49,6 +72,9 @@ export const registerCorpsMember = async (data) => {
       {
         userId: newUser.id,
         callUpNumber,
+        verificationStatus: verificationResult.data.verified
+          ? "VERIFIED"
+          : "REJECTED",
       },
       { transaction },
     );
@@ -81,7 +107,7 @@ export const registerCorpsMember = async (data) => {
     throw error;
   }
 };
-// verify email address and update user verification status.
+// verify email address
 export const verifyEmail = async (data) => {
   const { email, otp } = data;
 
@@ -113,6 +139,76 @@ export const verifyEmail = async (data) => {
     message: "Email verified successfully.",
   };
 };
+// Resend verification otp
+export const resendVerificationOtp = async (data) => {
+  const { email } = data;
+
+  const user = await User.findOne({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+  if (user.isEmailVerified) {
+    throw new Error("Email is already verified.");
+  }
+
+  // Generate a new OTP
+  const { otpCode, otpExpiresAt } = generateOtp();
+
+  await user.update({
+    emailVerificationOtp: otpCode,
+    emailVerificationOtpExpiresAt: otpExpiresAt,
+  });
+  const emailResult = await sendOnboardingOtpEmail(
+    user.email,
+    user.fullName,
+    otpCode,
+    user.role,
+  );
+  if (!emailResult.success) {
+    throw new Error("Failed to send verification email.");
+  }
+  return {
+    success: true,
+    message: "Verification OTP sent successfully.",
+  };
+};
+
+// Login user
+export const login = async (data) => {
+  const { email, password } = data;
+
+  const user = await User.findOne({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("Invalid email or password.");
+  }
+  if (!user.isEmailVerified) {
+    throw new Error("Please verify your email before logging in.");
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new Error("Invalid email or password.");
+  }
+  const token = generateToken({
+    userId: user.id,
+    role: user.role,
+  });
+  return {
+    success: true,
+    message: "Login successful.",
+    token,
+    data: {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    },
+  };
+};
 
 export const requestPasswordReset = async (data) => {
   const { email } = data;
@@ -125,12 +221,8 @@ export const requestPasswordReset = async (data) => {
     throw new Error("User not found.");
   }
 
-  // Generate OTP
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-  // OTP expires in 10 minutes
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
+  // Generate OTP for password reset
+  const { otpCode, otpExpiresAt } = generateOtp();
   await user.update({
     passwordResetOtp: otpCode,
     passwordResetOtpExpiresAt: otpExpiresAt,
@@ -208,7 +300,7 @@ export const resetPassword = async (data) => {
     throw new Error("Invalid OTP.");
   }
   if (new Date() > user.passwordResetOtpExpiresAt) {
-    throw new Error("OTP has expired.");
+    throw new Error("OTP has TokenExpiredError.");
   }
   await user.update({
     password: newPassword,
@@ -218,95 +310,5 @@ export const resetPassword = async (data) => {
   return {
     success: true,
     message: "Password reset successfully.",
-  };
-};
-
-export const registerLandlord = async (data, files) => {
-  const { fullName, email, phone, password } = data;
-
-  if (!files || !files.selfie || !files.validId) {
-    throw new Error("Both selfie and valid ID images are required.");
-  }
-
-  const existingLandlord = await Landlord.findOne({
-    where: { email },
-  });
-
-  if (existingLandlord) {
-    throw new Error("A landlord with this email already exists.");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const newLandlord = await Landlord.create({
-    fullName,
-    email,
-    phone,
-    password: hashedPassword,
-    selfieUrl: files.selfie[0].path,
-    validIdUrl: files.validId[0].path,
-    isVerified: false,
-    verificationStatus: "PENDING",
-  });
-
-  return {
-    success: true,
-    message:
-      "Landlord registered successfully. Verification is pending approval.",
-    data: {
-      id: newLandlord.id,
-      fullName: newLandlord.fullName,
-      email: newLandlord.email,
-      verificationStatus: newLandlord.verificationStatus,
-    },
-  };
-};
-
-export const loginLandlord = async (data) => {
-  const { email, password } = data;
-
-  console.log("Email entered:", email);
-  console.log("Password entered:", password);
-
-  const landlord = await Landlord.findOne({
-    where: { email },
-  });
-
-  console.log(
-    "Landlord found:",
-    landlord ? landlord.email : "No landlord found",
-  );
-
-  if (!landlord) {
-    throw new Error("Invalid email or password.");
-  }
-
-  console.log("Stored hash:", landlord.password);
-
-  const isPasswordValid = await bcrypt.compare(password, landlord.password);
-
-  console.log("Password Match:", isPasswordValid);
-
-  if (!isPasswordValid) {
-    throw new Error("Invalid email or password.");
-  }
-
-  const token = generateToken({
-    userId: landlord.id,
-    role: "Landlords",
-    userType: "landlord",
-  });
-
-  return {
-    success: true,
-    message: "Landlord login successful.",
-    token,
-    data: {
-      id: landlord.id,
-      fullName: landlord.fullName,
-      email: landlord.email,
-      role: "Landlords",
-      verificationStatus: landlord.verificationStatus,
-    },
   };
 };

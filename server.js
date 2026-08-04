@@ -4,11 +4,11 @@ import "dotenv/config";
 
 const PORT = process.env.PORT || 5001;
 
-const startServer = async() => {
-    try{
-        console.log("Syncing DB models");
-        await sequelize.sync();
-        console.log("DB models synced successfully")
+const startServer = async () => {
+  try {
+    console.log("Syncing DB models");
+    await sequelize.sync();
+    console.log("DB models synced successfully");
 
     app.listen(PORT, () => {
       console.log(`Server is running on: http://localhost:${PORT}`);
