@@ -9,6 +9,7 @@ import {
   authenticateUser,
   authorizeRoles,
 } from "../middleware/auth-middleware.js";
+import { validateUpdateCorpProfile } from "../validators/corps-validators.js";
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.put(
   "/profile",
   authenticateUser,
   authorizeRoles("Corps_members"),
+  validateUpdateCorpProfile,
   updateCorpProfile,
 );
 router.delete(
