@@ -1,4 +1,4 @@
-import { User, CorpsMember, sequelize } from "../models/index.js";
+import { User, CorpsMember, Landlord, sequelize } from "../models/index.js";
 import {
   sendOnboardingOtpEmail,
   sendPasswordResetOtpEmail,
@@ -19,7 +19,7 @@ export const registerCorpsMember = async (data) => {
   if (existingUser) {
     throw new Error("Email already exists.");
   }
-  // check if call-up number already exists;///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // check if call-up number already exists;//
   const existingCorpsMember = await CorpsMember.findOne({
     where: {
       callUpNumber,
@@ -28,8 +28,7 @@ export const registerCorpsMember = async (data) => {
   if (existingCorpsMember) {
     throw new Error("Call-up number already exists.");
   }
-  //Real Prembly verification (disabled temporarily because the service is down)
-  // Mock verification is enabled temporarily because the service is down. Set MOCK_PREMBLY_VERIFICATION to false to disable mock verification.
+
   let verificationResult;
 
   if (process.env.MOCK_PREMBLY_VERIFICATION === "true") {
@@ -176,40 +175,6 @@ export const resendVerificationOtp = async (data) => {
   };
 };
 
-// Login user
-export const login = async (data) => {
-  const { email, password } = data;
-
-  const user = await User.findOne({
-    where: { email },
-  });
-  if (!user) {
-    throw new Error("Invalid email or password.");
-  }
-  if (!user.isEmailVerified) {
-    throw new Error("Please verify your email before logging in.");
-  }
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw new Error("Invalid email or password.");
-  }
-  const token = generateToken({
-    userId: user.id,
-    role: user.role,
-  });
-  return {
-    success: true,
-    message: "Login successful.",
-    token,
-    data: {
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    },
-  };
-};
-
 export const requestPasswordReset = async (data) => {
   const { email } = data;
 
@@ -310,5 +275,102 @@ export const resetPassword = async (data) => {
   return {
     success: true,
     message: "Password reset successfully.",
+  };
+};
+
+export const loginLandlord = async (data) => {
+  const { email, password } = data;
+
+  const landlord = await Landlord.findOne({
+    where: { email },
+  });
+
+  if (!landlord) {
+    throw new Error("Invalid email or password.");
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    password,
+    landlord.password
+  );
+
+  if (!isPasswordValid) {
+    throw new Error("Invalid email or password.");
+  }
+
+  const token = generateToken({
+    userId: landlord.id,
+    role: "Landlords",
+    userType: "landlord",
+  });
+
+  return {
+    success: true,
+    message: "Landlord login successful.",
+    token,
+    data: {
+      id: landlord.id,
+      fullName: landlord.fullName,
+      email: landlord.email,
+      role: "Landlords",
+      verificationStatus: landlord.verificationStatus,
+    },
+  };
+};
+
+
+export const registerLandlord = async (data, files) => {
+  const {
+    fullName,
+    email,
+    phone,
+    password,
+  } = data;
+
+  // Check if landlord already exists
+  const existingLandlord = await Landlord.findOne({
+    where: { email },
+  });
+
+  if (existingLandlord) {
+    throw new Error("Email already exists.");
+  }
+
+  // Ensure uploads exist
+  if (!files?.selfie?.length) {
+    throw new Error("Selfie is required.");
+  }
+
+  if (!files?.validId?.length) {
+    throw new Error("Valid ID is required.");
+  }
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Cloudinary URLs
+  const selfieUrl = files.selfie[0].path;
+  const validIdUrl = files.validId[0].path;
+
+  // Create landlord
+  const landlord = await Landlord.create({
+    fullName,
+    email,
+    phone,
+    password: hashedPassword,
+    selfieUrl,
+    validIdUrl,
+    verificationStatus: "PENDING",
+  });
+
+  return {
+    success: true,
+    message: "Landlord registered successfully.",
+    data: {
+      id: landlord.id,
+      fullName: landlord.fullName,
+      email: landlord.email,
+      verificationStatus: landlord.verificationStatus,
+    },
   };
 };

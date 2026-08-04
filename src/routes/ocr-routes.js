@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post(
   "/callup-letter",
-  uploadCallUpLetter.single("callUpLetter"),
+  uploadCallUpLetter,
   extractCallUpDetails,
 );
 

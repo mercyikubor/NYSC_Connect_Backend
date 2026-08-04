@@ -51,7 +51,7 @@ export const getProperties = async (req, res) => {
     } = req.query;
 
     const whereClause = {
-      verificationStatus: "APPROVED",
+      verificationStatus: "approved",
     };
 
     if (state) {
