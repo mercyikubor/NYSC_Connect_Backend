@@ -19,7 +19,7 @@ export const registerCorpsMember = async (data) => {
   if (existingUser) {
     throw new Error("Email already exists.");
   }
-  // check if call-up number already exists;///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // check if call-up number already exists
   const existingCorpsMember = await CorpsMember.findOne({
     where: {
       callUpNumber,
@@ -98,12 +98,6 @@ export const registerCorpsMember = async (data) => {
     };
   } catch (error) {
     await transaction.rollback();
-
-    console.error("========== REGISTER ERROR ==========");
-    console.error(error);
-    console.error(error.parent);
-    console.error(error.original);
-
     throw error;
   }
 };
@@ -242,49 +236,6 @@ export const requestPasswordReset = async (data) => {
   return {
     success: true,
     message: "Password reset OTP sent successfully.",
-  };
-};
-
-// Login user
-export const login = async (data) => {
-  const { email, password } = data;
-
-  const user = await User.findOne({
-    where: { email },
-  });
-
-  if (!user) {
-    throw new Error("Invalid email or password.");
-  }
-
-  if (!user.isEmailVerified) {
-    throw new Error("Please verify your email before logging in.");
-  }
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-
-  console.log("Entered password:", password);
-  console.log("Stored hash:", user.password);
-  console.log("Password valid:", isPasswordValid);
-
-  if (!isPasswordValid) {
-    throw new Error("Invalid email or password.");
-  }
-
-  const token = generateToken({
-    userId: user.id,
-    role: user.role,
-  });
-
-  return {
-    success: true,
-    message: "Login successful.",
-    token,
-    data: {
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    },
   };
 };
 

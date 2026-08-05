@@ -10,6 +10,8 @@ import Property from "./property.js";
 User.hasOne(CorpsMember, {
   foreignKey: "userId",
   as: "corpsMember",
+  onDelete: "CASCADE",
+  hooks: true,
 });
 
 CorpsMember.belongsTo(User, {
@@ -53,6 +55,7 @@ Landlord.hasMany(Property, {
   foreignKey: "landlordId",
   as: "properties",
   onDelete: "CASCADE",
+  hooks: true,
 });
 
 Property.belongsTo(Landlord, {

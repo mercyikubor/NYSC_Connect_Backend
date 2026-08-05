@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { User, Business } from "../models/index.js";
+import Business from "../models/business.js";
 import { fetchNearbyBusinesses } from "../services/overpassService.js";
 
 export const getNearbyBusinessByGps = async (req, res) => {
@@ -13,10 +13,7 @@ export const getNearbyBusinessByGps = async (req, res) => {
       });
     }
 
-    const radiusKm = Math.min(
-      Number(req.query.radiusInKm) || 1,
-      5
-    );
+    const radiusKm = Math.min(Number(req.query.radiusInKm) || 1, 5);
 
     const userLat = parseFloat(lat);
     const userLng = parseFloat(lng);
@@ -71,7 +68,7 @@ export const getNearbyBusinessByGps = async (req, res) => {
     const osmBusinesses = await fetchNearbyBusinesses(
       userLat,
       userLng,
-      radiusMeters
+      radiusMeters,
     );
 
     if (osmBusinesses.length > 0) {

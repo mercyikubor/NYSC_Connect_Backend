@@ -49,7 +49,7 @@ const User = sequelize.define(
     },
     emailVerificationOtp: {
       type: DataTypes.STRING,
-      defaultValue: false,
+      allowNull: true,
     },
     emailVerificationOtpExpiresAt: {
       type: DataTypes.DATE,

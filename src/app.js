@@ -6,10 +6,9 @@ import businessRoutes from "./routes/business-router.js";
 import corpRoutes from "./routes/corp-routes.js";
 import authRoutes from "./routes/auth-routes.js";
 import ocrRoutes from "./routes/ocr-routes.js";
-import locationRoutes from "./routes/location-controller..js";
+import locationRoutes from "./routes/location-routes.js";
 import propertyRoutes from "./routes/property-routes.js";
 import adminRoutes from "./routes/admin-routes.js";
-
 
 const app = express();
 
