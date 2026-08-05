@@ -3,7 +3,7 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "src/uploads/");
   },
 
   filename: (req, file, cb) => {
@@ -11,7 +11,9 @@ const storage = multer.diskStorage({
   },
 });
 
-export const uploadCallUpLetter = multer({
+const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+
+export const uploadCallUpLetter = upload.single("callUpLetter");

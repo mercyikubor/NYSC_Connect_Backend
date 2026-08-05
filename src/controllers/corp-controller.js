@@ -9,7 +9,7 @@ export const getAllCorpProfiles = async (req, res) => {
         {
           model: User,
           as: "user",
-          attributes: ["email", "role", "createdAt", "isOnboardingComplete"],
+          attributes: ["email", "role", "createdAt"],
         },
         {
           model: State,
@@ -46,7 +46,7 @@ export const getSingleCorpProfileByAdmin = async (req, res) => {
         {
           model: User,
           as: "user",
-          attributes: ["email", "role", "createdAt", "isOnboardingComplete"],
+          attributes: ["email", "role", "createdAt"],
         },
         {
           model: State,
@@ -113,7 +113,7 @@ export const updateCorpProfileByAdmin = async (req, res) => {
         {
           model: User,
           as: "user",
-          attributes: ["email", "role", "createdAt", "isOnboardingComplete"],
+          attributes: ["email", "role", "createdAt"],
         },
         {
           model: State,
@@ -176,7 +176,7 @@ export const getCorpProfile = async (req, res) => {
         {
           model: User,
           as: "user",
-          attributes: ["email", "role", "createdAt", "isOnboardingComplete"],
+          attributes: ["email", "role", "createdAt"],
         },
         {
           model: State,
@@ -240,12 +240,6 @@ export const updateCorpProfile = async (req, res) => {
       lgaId,
       ppaName,
     });
-    await User.update(
-      { isOnboardingComplete: true },
-      {
-        where: { id: userId },
-      },
-    );
 
     const updatedProfile = await CorpsMember.findOne({
       where: { userId },
@@ -253,7 +247,7 @@ export const updateCorpProfile = async (req, res) => {
         {
           model: User,
           as: "user",
-          attributes: ["email", "role", "createdAt", "isOnboardingComplete"],
+          attributes: ["email", "role", "createdAt"],
         },
         {
           model: State,

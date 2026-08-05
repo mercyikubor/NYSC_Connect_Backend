@@ -7,12 +7,9 @@ import corpRoutes from "./routes/corp-routes.js";
 import authRoutes from "./routes/auth-routes.js";
 import ocrRoutes from "./routes/ocr-routes.js";
 import locationRoutes from "./routes/location-routes.js";
-import propertyRoutes from "./routes/property-routes.js";
-import adminRoutes from "./routes/admin-routes.js";
 
 const app = express();
 
-app.use("/api/admin", adminRoutes);
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
@@ -32,7 +29,6 @@ app.use("/api/corps-member", corpRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/ocr", ocrRoutes);
 app.use("/api/locations", locationRoutes);
-app.use("/api/properties", propertyRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({
