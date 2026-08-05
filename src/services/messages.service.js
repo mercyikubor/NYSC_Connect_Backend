@@ -23,6 +23,7 @@ const messagesService = {
     });
   },
 
+
   async sendDirectMessage({ senderId, receiverId, content, attachments }) {
     if (senderId === receiverId) {
       throw new ApiError(400, "You cannot send a message to yourself");
@@ -45,6 +46,7 @@ const messagesService = {
     });
   },
 
+
   async getCommunityMessages(communityId, { page, limit } = {}) {
     return messagesRepository.getCommunityMessages(communityId, {
       page,
@@ -52,14 +54,76 @@ const messagesService = {
     });
   },
 
+
   async getDirectMessages(userIdA, userIdB, { page, limit } = {}) {
-    // NOTE: blocking only prevents *sending* new DMs, per the spec.
-    // Existing conversation history stays visible even after a block, since
-    // the messages already happened before the block existed.
     return messagesRepository.getDirectMessages(userIdA, userIdB, {
       page,
       limit,
     });
+  },
+
+
+  // NEW: Get user's conversation list
+  async getChats(userId, { page, limit } = {}) {
+    return messagesRepository.getChats(userId, {
+      page,
+      limit,
+    });
+  },
+
+
+  // NEW: Search conversations by username
+  async searchChats(userId, search, { limit } = {}) {
+    if (!search || search.trim().length === 0) {
+      throw new ApiError(400, "Search term is required");
+    }
+
+    return messagesRepository.searchChats(
+      userId,
+      search.trim(),
+      {
+        limit,
+      }
+    );
+  },
+
+
+    // Search messages inside a direct conversation
+  async searchMessages(
+    userIdA,
+    userIdB,
+    search,
+    { page, limit } = {}
+  ) {
+    if (!search || search.trim().length === 0) {
+      throw new ApiError(400, "Search term is required");
+    }
+
+    return messagesRepository.searchMessages(
+      userIdA,
+      userIdB,
+      search.trim(),
+      {
+        page,
+        limit,
+      }
+    );
+  },
+
+
+  // Mark messages received from another user as read
+  async markMessagesAsRead(senderId, receiverId) {
+    if (senderId === receiverId) {
+      throw new ApiError(
+        400,
+        "You cannot mark your own messages as read"
+      );
+    }
+
+    return messagesRepository.markMessagesAsRead(
+      senderId,
+      receiverId
+    );
   },
 };
 
