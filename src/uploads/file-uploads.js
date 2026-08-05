@@ -7,12 +7,19 @@ const storage = multer.diskStorage({
   },
 
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + path.extname(file.originalname);
-    cb(null, uniqueName);
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
+<<<<<<< HEAD
 export const uploadCallUpLetter = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+=======
+const upload = multer({ storage });
+
+export const uploadCallUpLetter = upload.single("callUpLetter");
+
+export default upload;
+>>>>>>> 8ce52f178994cc9a96a2a9ead2b71e08c3a49a8f

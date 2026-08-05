@@ -4,10 +4,6 @@ import { extractCallUpDetails } from "../controllers/ocr-controller.js";
 
 const router = express.Router();
 
-router.post(
-  "/callup-letter",
-  uploadCallUpLetter.single("callUpLetter"),
-  extractCallUpDetails,
-);
+router.post("/callup-letter", uploadCallUpLetter, extractCallUpDetails);
 
 export default router;

@@ -29,8 +29,6 @@ export const createProperty = async (req, res) => {
       data: property,
     });
   } catch (error) {
-    console.error(error);
-
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -173,7 +171,7 @@ export const updateProperty = async (req, res) => {
     ];
 
     const hasCoreUpdate = resetFields.some(
-      (field) => req.body[field] !== undefined
+      (field) => req.body[field] !== undefined,
     );
 
     const updateData = {
@@ -209,10 +207,7 @@ export const deleteProperty = async (req, res) => {
       });
     }
 
-    if (
-      property.landlordId !== req.user.userId &&
-      req.user.role !== "Admin"
-    ) {
+    if (property.landlordId !== req.user.userId && req.user.role !== "Admin") {
       return res.status(403).json({
         success: false,
         message: "Unauthorized",
@@ -268,9 +263,7 @@ export const verifyProperty = async (req, res) => {
     await property.update({
       verificationStatus: status,
       rejectionReason:
-        status === "rejected"
-          ? rejectionReason || "Failed verification"
-          : null,
+        status === "rejected" ? rejectionReason || "Failed verification" : null,
     });
 
     return res.status(200).json({
