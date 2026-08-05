@@ -1,27 +1,26 @@
 import { User } from "./src/models/index.js";
+import "dotenv/config";
 
 const createAdmin = async () => {
   try {
-    // Delete existing admin if it exists
-    await User.destroy({
+    const existingAdmin = await User.findOne({
       where: {
-        email: "admin@nyscconnect.com",
+        email: process.env.ADMIN_EMAIL,
       },
     });
-
+    if (existingAdmin) {
+      process.exit(0);
+    }
     // Create a new admin
-    const admin = await User.create({
-      fullName: "System Admin",
-      email: "admin@nyscconnect.com",
-      phoneNumber: "08011111111",
-      password: "Admin123!", // Will be hashed automatically
+    await User.create({
+      fullName: process.env.ADMIN_FULL_NAME,
+      email: process.env.ADMIN_EMAIL,
+      phoneNumber: process.env.ADMIN_PHONE,
+      password: process.env.ADMIN_PASSWORD,
       role: "Admin",
       isEmailVerified: true,
       isOnboardingComplete: true,
     });
-
-    console.log("✅ Admin created successfully!");
-    console.log(admin.email);
 
     process.exit(0);
   } catch (error) {

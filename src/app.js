@@ -9,6 +9,7 @@ import ocrRoutes from "./routes/ocr-routes.js";
 import locationRoutes from "./routes/location-controller..js";
 import propertyRoutes from "./routes/property-routes.js";
 import adminRoutes from "./routes/admin-routes.js";
+import landlordRoutes from "./routes/landlord-routes.js";
 
 
 const app = express();
