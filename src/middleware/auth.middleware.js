@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "../utils/asyncHandler.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 import models from "../models/index.js";
 
 const { User } = models;

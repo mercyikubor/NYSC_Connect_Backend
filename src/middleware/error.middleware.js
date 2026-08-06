@@ -1,4 +1,4 @@
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 // Central error handler. Anything thrown in a controller/service (wrapped by
 // asyncHandler) ends up here via next(error).
