@@ -2,7 +2,14 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-
+import communityRoutes from "./routes/communities.routes.js";
+import messageRoutes from "./routes/messages.routes.js";
+import groupRoutes from "./routes/groups.routes.js";
+import blockRoutes from "./routes/blocks.routes.js";
+import announcementRoutes from "./routes/announcements.routes.js";
+import postRoutes from "./routes/posts.routes.js";
+import notFound from "./middleware/notFound.middleware.js";
+import errorMiddleware from "./middleware/error.middleware.js";
 import businessRoutes from "./routes/business-router.js";
 import corpRoutes from "./routes/corp-routes.js";
 import authRoutes from "./routes/auth-routes.js";
@@ -15,15 +22,12 @@ import adminAuthRoutes from "./routes/admin-auth-routes.js";
 
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(helmet());
 app.use(cors());
 app.use(morgan("dev"));
 
-// Home Route
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
@@ -32,7 +36,12 @@ app.get("/", (req, res) => {
   });
 });
 
-// API Routes
+app.use("/api/communities", communityRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/groups", groupRoutes);
+app.use("/api/blocks", blockRoutes);
+app.use("/api/announcements", announcementRoutes);
+app.use("/api/posts", postRoutes);
 app.use("/api/landlords", landlordRoutes);
 app.use("/api/businesses", businessRoutes);
 app.use("/api/corps-member", corpRoutes);
@@ -43,7 +52,6 @@ app.use("/api/properties", propertyRoutes);
 app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/admin", adminRoutes);
 
-// 404
 app.use((req, res) => {
   res.status(404).json({
     status: "fail",
@@ -51,7 +59,6 @@ app.use((req, res) => {
   });
 });
 
-// Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err);
 

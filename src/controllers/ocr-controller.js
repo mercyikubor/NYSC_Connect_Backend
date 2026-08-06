@@ -1,3 +1,4 @@
+import cloudinary from "../config/cloudinary.js";
 import { extractTextFromImage } from "../services/ocr-services.js";
 import { parseCallUpLetter } from "../services/callupLetter-Parser.js";
 
@@ -9,17 +10,21 @@ export const extractCallUpDetails = async (req, res) => {
         message: "Please upload a Call-Up Letter.",
       });
     }
-    const fileUrl = req.file.path;
+    const filePath = req.file.path;
 
-    const ocrResult = await extractTextFromImage(fileUrl);
+    const ocrResult = await extractTextFromImage(filePath);
     const parsedText = ocrResult.ParsedResults?.[0]?.ParsedText || "";
     const extractedData = parseCallUpLetter(parsedText);
 
+    const cloudinaryResult = await cloudinary.uploader.upload(filePath, {
+      folder: "call_up_letters",
+      resource_type: "auto",
+    });
     return res.status(200).json({
       success: true,
       message: "Call-Up Letter processed successfully.",
-      file: req.file,
-      extractedData: extractedData,
+      cloudinaryUrl: cloudinaryResult.secure_url,
+      extractedData,
     });
   } catch (error) {
     return res.status(500).json({

@@ -2,10 +2,10 @@
   "name": "nysc-connect-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "./server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon ./server.js"
   },
   "keywords": [],
   "author": "",
@@ -28,8 +28,10 @@
     "multer": "^2.2.0",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.23.1",
+    "node-geocoder": "^4.4.1",
     "nodemailer": "^9.0.3",
     "sequelize": "^6.37.8",
+    "socket.io": "^4.8.3",
     "twilio": "^6.0.2"
   },
   "devDependencies": {
