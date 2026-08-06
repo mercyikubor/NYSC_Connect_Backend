@@ -43,13 +43,6 @@ export const getNearbyBusinessByGps = async (req, res) => {
           ],
         ],
       },
-      include: [
-        {
-          model: User,
-          as: "user",
-          attributes: ["fullName", "email", "phoneNumber"],
-        },
-      ],
       having: Sequelize.literal(`distance <= ${radiusKm}`),
       order: [[Sequelize.literal("distance"), "ASC"]],
     });

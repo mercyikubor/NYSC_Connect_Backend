@@ -21,13 +21,18 @@ const CATEGORY_MAP = {
     clinic: "Hospital",
     doctors: "Hospital",
     dentist: "Hospital",
+    veterinary: "Veterinary",
 
     mall: "Shopping Mall",
+
     clothes: "Fashion",
     shoes: "Fashion",
     boutique: "Fashion",
+
     cosmetics: "Beauty",
+    beauty: "Beauty",
     hairdresser: "Beauty",
+    spa: "Spa",
 
     electronics: "Electronics",
     mobile_phone: "Electronics",
@@ -46,9 +51,12 @@ const CATEGORY_MAP = {
     car_repair: "Mechanic",
     car_wash: "Car Wash",
     parking: "Parking",
+    car_rental: "Car Rental",
+    car_dealer: "Car Dealer",
 
     school: "School",
     university: "University",
+    library: "Library",
 
     church: "Church",
     mosque: "Mosque",
@@ -57,8 +65,24 @@ const CATEGORY_MAP = {
     gym: "Gym",
     stadium: "Stadium",
     park: "Park",
-};
 
+    internet_cafe: "Internet Cafe",
+
+    office: "Office",
+
+    post_office: "Post Office",
+
+    marketplace: "Market",
+
+    laundry: "Laundry",
+
+    tailor: "Tailor",
+
+    bookshop: "Bookstore",
+    stationery: "Bookstore",
+
+    community_centre: "Community Center",
+};
 
 export function mapCategory(tags = {}) {
 
@@ -70,7 +94,6 @@ export function mapCategory(tags = {}) {
         tags.office ||
         tags.craft;
 
-
     if (!value) {
         return {
             category: "Others",
@@ -78,9 +101,7 @@ export function mapCategory(tags = {}) {
         };
     }
 
-
     const normalizedValue = value.toLowerCase().trim();
-
 
     return {
         category: CATEGORY_MAP[normalizedValue] || "Others",
@@ -88,76 +109,64 @@ export function mapCategory(tags = {}) {
     };
 }
 
-function normalizeWebsite(url){
-    if(!url){
-        return null;
-    }
+function normalizeWebsite(url) {
+    if (!url) return null;
 
     url = url.trim();
 
-    if(!url){
-        return null;
-    }
+    if (!url) return null;
 
-    try{
-        if(
+    try {
+        if (
             !url.startsWith("http://") &&
             !url.startsWith("https://")
-        ){
+        ) {
             url = `https://${url}`;
         }
 
         new URL(url);
 
         return url;
-    } catch(error){
+    } catch {
         return null;
     }
 }
 
-function normalizeUrl(url){
-    if(!url){
-        return null;
-    }
+function normalizeUrl(url) {
+    if (!url) return null;
 
     url = url.trim();
 
-    if(!url){
-        return null;
-    }
+    if (!url) return null;
 
-    try{
-        if(
+    try {
+        if (
             !url.startsWith("http://") &&
             !url.startsWith("https://")
-        ){
+        ) {
             url = `https://${url}`;
         }
 
         new URL(url);
 
         return url;
-    }catch(error){
+    } catch {
         return null;
     }
 }
 
-function normalizeEmail(email){
-    if(!email){
-        return null;
-    }
+function normalizeEmail(email) {
+    if (!email) return null;
 
     email = email.trim();
 
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    return regex.test(email)
-    ? email
-    : null;
+    return regex.test(email) ? email : null;
 }
 
-function createSlug(value){
-    if(!value){
+function createSlug(value) {
+    if (!value) {
         return null;
     }
 
@@ -168,20 +177,30 @@ function createSlug(value){
         .replace(/^-+|-+$/g, "");
 }
 
-
-
 export function mapBusiness(element) {
 
     const tags = element.tags || {};
 
+    if (
+        tags.highway ||
+        tags.junction ||
+        tags.crossing ||
+        tags.public_transport ||
+        tags.railway
+    ) {
+        return null;
+    }
+
     const categoryData = mapCategory(tags);
 
     const address = [
-            tags["addr:housenumber"],
-            tags["addr:street"],
-            tags["addr:suburb"],
-            tags["addr:city"],
-        ].filter(Boolean).join(", ");
+        tags["addr:housenumber"],
+        tags["addr:street"],
+        tags["addr:suburb"],
+        tags["addr:city"],
+    ]
+        .filter(Boolean)
+        .join(", ");
 
     return {
 
@@ -197,13 +216,11 @@ export function mapBusiness(element) {
 
         osmCategory: categoryData.osmCategory,
 
-
         description:
-            tags.description || 
-            tags.note || 
-            tags.brand || 
+            tags.description ||
+            tags.note ||
+            tags.brand ||
             null,
-
 
         phoneNumber:
             tags.phone ||
@@ -216,77 +233,65 @@ export function mapBusiness(element) {
         ),
 
         searchName:
-        (tags.name || "Unnamed Business")
-            .toLowerCase()
-            .trim(),
+            (tags.name || "Unnamed Business")
+                .toLowerCase()
+                .trim(),
 
         email: normalizeEmail(
             tags.email ||
             tags["contact:email"] ||
-            null,
+            null
         ),
 
         website: normalizeWebsite(
             tags.website ||
             tags["contact:website"] ||
-            null,
+            null
         ),
 
-        address: 
+        address:
             address ||
             tags.address ||
             "Unknown",
 
-
         city:
             tags["addr:city"] ||
             null,
-
 
         state:
             mapNigeriaState(
                 tags["addr:state"]
             ),
 
-
         countryCode: "NG",
 
-
         latitude:
-            Number(element.lat ||
-            element.center?.lat) ||
-            null,
-
+            Number(
+                element.lat ||
+                element.center?.lat
+            ) || null,
 
         longitude:
-            Number(element.lon ||
-            element.center?.lon) || 
-            null,
-
+            Number(
+                element.lon ||
+                element.center?.lon
+            ) || null,
 
         openingHours:
             tags.opening_hours ||
             null,
 
-
         imageUrl: normalizeUrl(
             tags.image ||
             tags.wikimedia ||
-            null,
+            null
         ),
 
-
         logoUrl: null,
-
-
         featured: false,
-
         verified: false,
-
         isOperational: true,
-
         syncStatus: "active",
-
-        lastSynced:new Date(),
+        lastSynced: new Date(),
     };
 }
