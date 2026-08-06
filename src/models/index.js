@@ -1,6 +1,6 @@
 import sequelize from "../config/db.js";
 
-import defineUser from "./user.model.js";
+import defineUser from "./user.js";
 import defineCommunity from "./community.model.js";
 import defineCommunityMember from "./communityMember.model.js";
 import definePost from "./post.model.js";
