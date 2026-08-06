@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Businesses {
+  id            String              @id @db.Char(36)
+  sellerId      String              @db.Char(36)
+  name          String              @db.VarChar(255)
+  category      Businesses_category
+  description   String?             @db.Text
+  phoneNumber   String              @db.VarChar(255)
+  address       String              @db.VarChar(255)
+  latitude      Decimal             @db.Decimal(10, 8)
+  longitude     Decimal             @db.Decimal(11, 8)
+  imageUrl      String?             @db.VarChar(255)
+  isOperational Boolean?            @default(true)
+  createdAt     DateTime            @db.DateTime(0)
+  updatedAt     DateTime            @db.DateTime(0)
+}
+
+
+model CorpsMembers {
+  id                 String                          @id @db.Char(36)
+  userId             String                          @unique(map: "userId") @db.Char(36)
+  callUpNumber       String                          @unique(map: "callUpNumber") @db.VarChar(255)
+  callUpLetterUrl    String?                         @db.VarChar(255)
+  batch              CorpsMembers_batch?
+  stream             CorpsMembers_stream?
+  stateOfDeployment  String?                         @db.VarChar(255)
+  stateCode          String?                         @unique(map: "stateCode") @db.VarChar(255)
+  ppaName            String?                         @db.VarChar(255)
+  verificationStatus CorpsMembers_verificationStatus @default(PENDING)
+  createdAt          DateTime                        @db.DateTime(0)
+  updatedAt          DateTime                        @db.DateTime(0)
+  Users              Users                           @relation(fields: [userId], references: [id], onDelete: Cascade, map: "CorpsMembers_ibfk_1")
+}
+
+model Users {
+  id                            String               @id @db.Char(36)
+  fullName                      String               @db.VarChar(255)
+  email                         String               @unique(map: "email") @db.VarChar(255)
+  phoneNumber                   String               @db.VarChar(255)
+  password                      String               @db.VarChar(255)
+  role                          Users_role           @default(Corps_members)
+  isEmailVerified               Boolean?             @default(false)
+  isOnboardingComplete          Boolean?             @default(false)
+  createdAt                     DateTime             @db.DateTime(0)
+  updatedAt                     DateTime             @db.DateTime(0)
+  emailVerificationOtp          String?              @default("0") @db.VarChar(255)
+  emailVerificationOtpExpiresAt DateTime?            @db.DateTime(0)
+  CorpsMembers                  CorpsMembers?
+}
+
+enum Businesses_category {
+  Restaurant
+  Super_Market @map("Super-Market")
+  FoodStuffs
+  Others
+}
+
+enum CorpsMembers_batch {
+  Batch_A @map("Batch A")
+  Batch_B @map("Batch B")
+  Batch_C @map("Batch C")
+}
+
+
+enum CorpsMembers_stream {
+  Stream_1 @map("Stream 1")
+  Stream_2 @map("Stream 2")
+}
+
+
+enum Users_role {
+  Corps_members
+  Landlords
+  Alumni
+  Business
+  Admin
+}
+
+enum CorpsMembers_verificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
