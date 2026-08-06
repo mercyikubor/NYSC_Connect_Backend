@@ -1,7 +1,8 @@
+import http from "http";
 import app from "./src/app.js";
 import sequelize from "./src/config/db.js";
-import { seedAdmin } from "./src/utils/seed-admin.js";
 import "dotenv/config";
+import { initializeSocket } from "./src/sockets/socket.js";
 
 const PORT = process.env.PORT || 5001;
 
@@ -13,11 +14,12 @@ const startServer = async () => {
 
     console.log("DB models synced successfully");
 
-    await seedAdmin();
-
     console.log("Starting Express server...");
 
-    app.listen(PORT, () => {
+    const httpServer = http.createServer(app);
+    initializeSocket(httpServer);
+
+    httpServer.listen(PORT, () => {
       console.log(`Server is running on: http://localhost:${PORT}`);
     });
   } catch (error) {

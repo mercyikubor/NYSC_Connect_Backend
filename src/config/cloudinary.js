@@ -2,6 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
@@ -11,9 +12,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// =========================
-// Call-up Letter Storage
-// =========================
 const callUpLetterStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -22,9 +20,6 @@ const callUpLetterStorage = new CloudinaryStorage({
   },
 });
 
-// =========================
-// Landlord Verification Storage
-// =========================
 const landlordStorage = new CloudinaryStorage({
   cloudinary,
   params: {
