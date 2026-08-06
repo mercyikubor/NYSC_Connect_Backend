@@ -1,6 +1,6 @@
 import cloudinary from "../config/cloudinary.js";
 import { extractTextFromImage } from "../services/ocr-services.js";
-import { parseCallUpLetter } from "../services/callupLetter-Parser.js";
+import { parseCallUpLetter } from "../services/callupLetter-parser.js";
 
 export const extractCallUpDetails = async (req, res) => {
   try {
