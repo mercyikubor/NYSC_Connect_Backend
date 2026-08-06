@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 
 # Dependencies
 node_modules/
@@ -29,3 +30,8 @@ src/uploads/
 # Test / coverage output
 coverage/
 reset-db.js
+=======
+# OS Build
+.DS_Store
+/src/generated/prisma
+>>>>>>> e472868f082e23583c2049879d930244f02dd7af

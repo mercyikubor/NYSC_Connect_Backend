@@ -12,19 +12,37 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@prisma/client": "^7.9.1",
+    "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
+<<<<<<< HEAD
+=======
+    "cloudinary": "^1.41.3",
+>>>>>>> e472868f082e23583c2049879d930244f02dd7af
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.1",
+    "express-validator": "^7.3.2",
+    "form-data": "^4.0.6",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
+    "multer": "^2.2.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.23.1",
+<<<<<<< HEAD
     "node-geocoder": "^4.4.1",
     "sequelize": "^6.37.8",
     "socket.io": "^4.8.3"
+=======
+    "nodemailer": "^9.0.3",
+    "sequelize": "^6.37.8",
+    "twilio": "^6.0.2"
+>>>>>>> e472868f082e23583c2049879d930244f02dd7af
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "prisma": "^7.9.1"
   }
 }

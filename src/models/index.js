@@ -1,4 +1,5 @@
 import sequelize from "../config/db.js";
+<<<<<<< HEAD
 
 import defineUser from "./user.js";
 import defineCommunity from "./community.model.js";
@@ -34,3 +35,70 @@ Object.values(models).forEach((model) => {
 
 export { sequelize };
 export default models;
+=======
+import User from "./user.js";
+import CorpsMember from "./corpsMember.js";
+import State from "./state.js";
+import LGA from "./lga.js";
+import Landlord from "./landlord.js";
+import Property from "./property.js";
+import Admin from "./admin.js";
+
+// User -> CorpsMember Association (One-to-One)
+User.hasOne(CorpsMember, {
+  foreignKey: "userId",
+  as: "corpsMember",
+  onDelete: "CASCADE",
+  hooks: true,
+});
+
+CorpsMember.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
+
+// State -> LGA Association (One-to-Many)
+State.hasMany(LGA, {
+  foreignKey: "stateId",
+  as: "lgas",
+});
+
+LGA.belongsTo(State, {
+  foreignKey: "stateId",
+  as: "state",
+});
+
+// State -> CorpsMember Association (One-to-Many)
+State.hasMany(CorpsMember, {
+  foreignKey: "stateId",
+  as: "corpsMembers",
+});
+CorpsMember.belongsTo(State, {
+  foreignKey: "stateId",
+  as: "state",
+});
+
+// LGA -> CorpsMember Association (One-to-Many)
+LGA.hasMany(CorpsMember, {
+  foreignKey: "lgaId",
+  as: "corpsMembers",
+});
+CorpsMember.belongsTo(LGA, {
+  foreignKey: "lgaId",
+  as: "lga",
+});
+
+// Landlord ↔ Property
+Landlord.hasMany(Property, {
+  foreignKey: "landlordId",
+  as: "properties",
+  onDelete: "CASCADE",
+  hooks: true,
+});
+
+Property.belongsTo(Landlord, {
+  foreignKey: "landlordId",
+  as: "landlord",
+});
+export { sequelize, User, CorpsMember, State, LGA, Landlord, Property, Admin };
+>>>>>>> e472868f082e23583c2049879d930244f02dd7af
