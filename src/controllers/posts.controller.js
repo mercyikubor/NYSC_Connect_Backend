@@ -1,7 +1,7 @@
 import postsService from "../services/posts.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
-import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asynchandler.js";
+import ApiResponse from "../utils/apiresponse.js";
+import ApiError from "../utils/apierror.js";
 
 const postsController = {
   // POST /posts
@@ -39,7 +39,9 @@ const postsController = {
 
     res
       .status(200)
-      .json(new ApiResponse(200, result, "Community posts fetched successfully"));
+      .json(
+        new ApiResponse(200, result, "Community posts fetched successfully"),
+      );
   }),
 
   // POST /posts/:postId/comments

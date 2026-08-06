@@ -1,7 +1,7 @@
 import groupsService from "../services/groups.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
-import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asynchandler.js";
+import ApiResponse from "../utils/apiresponse.js";
+import ApiError from "../utils/apierror.js";
 
 const groupsController = {
   // POST /groups
@@ -63,9 +63,7 @@ const groupsController = {
 
     res
       .status(200)
-      .json(
-        new ApiResponse(200, result, "Group members fetched successfully")
-      );
+      .json(new ApiResponse(200, result, "Group members fetched successfully"));
   }),
 
   // POST /groups/:groupId/join
@@ -87,9 +85,7 @@ const groupsController = {
 
     await groupsService.leaveGroup(groupId, userId);
 
-    res
-      .status(200)
-      .json(new ApiResponse(200, null, "Left group successfully"));
+    res.status(200).json(new ApiResponse(200, null, "Left group successfully"));
   }),
 };
 

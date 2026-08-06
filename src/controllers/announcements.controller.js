@@ -1,7 +1,7 @@
 import announcementsService from "../services/announcements.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
-import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asynchandler.js";
+import ApiResponse from "../utils/apiresponse.js";
+import ApiError from "../utils/apierror.js";
 
 const announcementsController = {
   // POST /announcements
@@ -25,7 +25,7 @@ const announcementsController = {
     res
       .status(201)
       .json(
-        new ApiResponse(201, announcement, "Announcement created successfully")
+        new ApiResponse(201, announcement, "Announcement created successfully"),
       );
   }),
 
@@ -37,14 +37,12 @@ const announcementsController = {
 
     const result = await announcementsService.getCommunityAnnouncements(
       communityId,
-      { page, limit }
+      { page, limit },
     );
 
     res
       .status(200)
-      .json(
-        new ApiResponse(200, result, "Announcements fetched successfully")
-      );
+      .json(new ApiResponse(200, result, "Announcements fetched successfully"));
   }),
 };
 

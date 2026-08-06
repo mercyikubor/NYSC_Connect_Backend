@@ -1,11 +1,10 @@
 import announcementsRepository from "../repositories/announcements.repository.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 const announcementsService = {
   async createAnnouncement({ communityId, userId, title, content, pinned }) {
-    const community = await announcementsRepository.findCommunityById(
-      communityId
-    );
+    const community =
+      await announcementsRepository.findCommunityById(communityId);
 
     if (!community) {
       throw new ApiError(404, "Community not found");
@@ -22,7 +21,7 @@ const announcementsService = {
 
     const membership = await announcementsRepository.getCommunityMembership(
       communityId,
-      userId
+      userId,
     );
     const isCommunityLeaderOrAdmin =
       membership && ["leader", "admin"].includes(membership.role);
@@ -30,7 +29,7 @@ const announcementsService = {
     if (!isSiteAdmin && !isCommunityLeaderOrAdmin) {
       throw new ApiError(
         403,
-        "Only community leaders/admins or a site admin can post announcements"
+        "Only community leaders/admins or a site admin can post announcements",
       );
     }
 
@@ -48,9 +47,8 @@ const announcementsService = {
   },
 
   async getCommunityAnnouncements(communityId, { page = 1, limit = 20 } = {}) {
-    const community = await announcementsRepository.findCommunityById(
-      communityId
-    );
+    const community =
+      await announcementsRepository.findCommunityById(communityId);
 
     if (!community) {
       throw new ApiError(404, "Community not found");

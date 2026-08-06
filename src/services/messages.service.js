@@ -1,18 +1,15 @@
 import messagesRepository from "../repositories/messages.repository.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 const messagesService = {
   async sendCommunityMessage({ communityId, senderId, content, attachments }) {
     const isMember = await messagesRepository.isCommunityMember(
       communityId,
-      senderId
+      senderId,
     );
 
     if (!isMember) {
-      throw new ApiError(
-        403,
-        "Only community members can post messages here"
-      );
+      throw new ApiError(403, "Only community members can post messages here");
     }
 
     return messagesRepository.createCommunityMessage({
@@ -23,7 +20,6 @@ const messagesService = {
     });
   },
 
-
   async sendDirectMessage({ senderId, receiverId, content, attachments }) {
     if (senderId === receiverId) {
       throw new ApiError(400, "You cannot send a message to yourself");
@@ -31,7 +27,7 @@ const messagesService = {
 
     const blocked = await messagesRepository.isBlockedEitherWay(
       senderId,
-      receiverId
+      receiverId,
     );
 
     if (blocked) {
@@ -46,7 +42,6 @@ const messagesService = {
     });
   },
 
-
   async getCommunityMessages(communityId, { page, limit } = {}) {
     return messagesRepository.getCommunityMessages(communityId, {
       page,
@@ -54,14 +49,12 @@ const messagesService = {
     });
   },
 
-
   async getDirectMessages(userIdA, userIdB, { page, limit } = {}) {
     return messagesRepository.getDirectMessages(userIdA, userIdB, {
       page,
       limit,
     });
   },
-
 
   // NEW: Get user's conversation list
   async getChats(userId, { page, limit } = {}) {
@@ -71,59 +64,36 @@ const messagesService = {
     });
   },
 
-
   // NEW: Search conversations by username
   async searchChats(userId, search, { limit } = {}) {
     if (!search || search.trim().length === 0) {
       throw new ApiError(400, "Search term is required");
     }
 
-    return messagesRepository.searchChats(
-      userId,
-      search.trim(),
-      {
-        limit,
-      }
-    );
+    return messagesRepository.searchChats(userId, search.trim(), {
+      limit,
+    });
   },
 
-
-    // Search messages inside a direct conversation
-  async searchMessages(
-    userIdA,
-    userIdB,
-    search,
-    { page, limit } = {}
-  ) {
+  // Search messages inside a direct conversation
+  async searchMessages(userIdA, userIdB, search, { page, limit } = {}) {
     if (!search || search.trim().length === 0) {
       throw new ApiError(400, "Search term is required");
     }
 
-    return messagesRepository.searchMessages(
-      userIdA,
-      userIdB,
-      search.trim(),
-      {
-        page,
-        limit,
-      }
-    );
+    return messagesRepository.searchMessages(userIdA, userIdB, search.trim(), {
+      page,
+      limit,
+    });
   },
-
 
   // Mark messages received from another user as read
   async markMessagesAsRead(senderId, receiverId) {
     if (senderId === receiverId) {
-      throw new ApiError(
-        400,
-        "You cannot mark your own messages as read"
-      );
+      throw new ApiError(400, "You cannot mark your own messages as read");
     }
 
-    return messagesRepository.markMessagesAsRead(
-      senderId,
-      receiverId
-    );
+    return messagesRepository.markMessagesAsRead(senderId, receiverId);
   },
 };
 

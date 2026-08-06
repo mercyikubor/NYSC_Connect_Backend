@@ -1,6 +1,6 @@
 import blocksService from "../services/blocks.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import asyncHandler from "../utils/asynchandler.js";
+import ApiResponse from "../utils/apiresponse.js";
 
 const blocksController = {
   // POST /blocks/:userId

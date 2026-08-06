@@ -1,6 +1,6 @@
 import messagesService from "../services/messages.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import asyncHandler from "../utils/asynchandler.js";
+import ApiResponse from "../utils/apiresponse.js";
 import { getIO } from "../sockets/socket.js";
 
 const messagesController = {
@@ -39,7 +39,7 @@ const messagesController = {
     res
       .status(200)
       .json(
-        new ApiResponse(200, result, "Community messages fetched successfully")
+        new ApiResponse(200, result, "Community messages fetched successfully"),
       );
   }),
 
@@ -74,16 +74,16 @@ const messagesController = {
     const result = await messagesService.getDirectMessages(
       userId,
       otherUserId,
-      { page, limit }
+      { page, limit },
     );
 
     res
       .status(200)
       .json(
-        new ApiResponse(200, result, "Direct messages fetched successfully")
+        new ApiResponse(200, result, "Direct messages fetched successfully"),
       );
   }),
-    // GET /messages/chats?page=1&limit=20
+  // GET /messages/chats?page=1&limit=20
   getChats: asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
@@ -97,11 +97,8 @@ const messagesController = {
 
     res
       .status(200)
-      .json(
-        new ApiResponse(200, result, "Chats fetched successfully")
-      );
+      .json(new ApiResponse(200, result, "Chats fetched successfully"));
   }),
-
 
   // GET /messages/chats/search?q=john
   searchChats: asyncHandler(async (req, res) => {
@@ -110,22 +107,18 @@ const messagesController = {
 
     const limit = Number(req.query.limit) || 20;
 
-    const result = await messagesService.searchChats(
-      userId,
-      q,
-      {
-        limit,
-      }
-    );
+    const result = await messagesService.searchChats(userId, q, {
+      limit,
+    });
 
     res
       .status(200)
       .json(
-        new ApiResponse(200, result, "Chats search completed successfully")
+        new ApiResponse(200, result, "Chats search completed successfully"),
       );
   }),
 
-    // GET /messages/direct/:otherUserId/search?q=text&page=1&limit=30
+  // GET /messages/direct/:otherUserId/search?q=text&page=1&limit=30
   searchMessages: asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const { otherUserId } = req.params;
@@ -141,20 +134,15 @@ const messagesController = {
       {
         page,
         limit,
-      }
+      },
     );
 
     res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
-          result,
-          "Messages search completed successfully"
-        )
+        new ApiResponse(200, result, "Messages search completed successfully"),
       );
   }),
-
 
   // PATCH /messages/direct/:otherUserId/read
   markMessagesAsRead: asyncHandler(async (req, res) => {
@@ -163,17 +151,13 @@ const messagesController = {
 
     const result = await messagesService.markMessagesAsRead(
       otherUserId,
-      receiverId
+      receiverId,
     );
 
     res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
-          result,
-          "Messages marked as read successfully"
-        )
+        new ApiResponse(200, result, "Messages marked as read successfully"),
       );
   }),
 };

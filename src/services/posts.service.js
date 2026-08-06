@@ -1,6 +1,6 @@
 import postsRepository from "../repositories/posts.repository.js";
 import { sequelize } from "../models/index.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 const postsService = {
   async createPost({ communityId, userId, content, media }) {
@@ -11,7 +11,7 @@ const postsService = {
 
     const isMember = await postsRepository.isCommunityMember(
       communityId,
-      userId
+      userId,
     );
     if (!isMember) {
       throw new ApiError(403, "Only community members can post here");
@@ -41,12 +41,12 @@ const postsService = {
 
     const isMember = await postsRepository.isCommunityMember(
       post.communityId,
-      userId
+      userId,
     );
     if (!isMember) {
       throw new ApiError(
         403,
-        "Only members of this post's community can comment"
+        "Only members of this post's community can comment",
       );
     }
 
@@ -57,7 +57,7 @@ const postsService = {
     return sequelize.transaction(async (transaction) => {
       const comment = await postsRepository.createComment(
         { postId, userId, content },
-        { transaction }
+        { transaction },
       );
 
       await postsRepository.incrementCommentsCount(postId, { transaction });

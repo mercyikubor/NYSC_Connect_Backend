@@ -1,6 +1,6 @@
 import groupsRepository from "../repositories/groups.repository.js";
 import { sequelize } from "../models/index.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 const groupsService = {
   async createGroup({ communityId, name, description, createdBy }) {
@@ -12,20 +12,20 @@ const groupsService = {
 
     const isMember = await groupsRepository.isCommunityMember(
       communityId,
-      createdBy
+      createdBy,
     );
 
     if (!isMember) {
       throw new ApiError(
         403,
-        "You must be a member of this community to create a group in it"
+        "You must be a member of this community to create a group in it",
       );
     }
 
     return sequelize.transaction(async (transaction) => {
       const group = await groupsRepository.create(
         { communityId, name, description, createdBy },
-        { transaction }
+        { transaction },
       );
 
       // Creator automatically becomes the group's first member/admin
@@ -80,19 +80,19 @@ const groupsService = {
     // community before you can join one of its groups.
     const isCommunityMember = await groupsRepository.isCommunityMember(
       group.communityId,
-      userId
+      userId,
     );
 
     if (!isCommunityMember) {
       throw new ApiError(
         403,
-        "You must be a member of the parent community to join this group"
+        "You must be a member of the parent community to join this group",
       );
     }
 
     const existingMembership = await groupsRepository.getMembership(
       groupId,
-      userId
+      userId,
     );
 
     if (existingMembership) {
@@ -104,7 +104,7 @@ const groupsService = {
         groupId,
         userId,
         "member",
-        { transaction }
+        { transaction },
       );
 
       await groupsRepository.incrementMembersCount(groupId, { transaction });

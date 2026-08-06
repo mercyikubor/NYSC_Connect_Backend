@@ -1,13 +1,10 @@
 import communitiesRepository from "../repositories/communities.repository.js";
 import { sequelize } from "../models/index.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 const communitiesService = {
   async getByStateAndLga(state, lga) {
-    const community = await communitiesRepository.findByStateAndLga(
-      state,
-      lga
-    );
+    const community = await communitiesRepository.findByStateAndLga(state, lga);
 
     if (!community) {
       throw new ApiError(404, `No community found for ${lga}, ${state}`);
@@ -17,9 +14,8 @@ const communitiesService = {
   },
 
   async getDetails(communityId) {
-    const community = await communitiesRepository.findByIdWithDetails(
-      communityId
-    );
+    const community =
+      await communitiesRepository.findByIdWithDetails(communityId);
 
     if (!community) {
       throw new ApiError(404, "Community not found");
@@ -47,7 +43,7 @@ const communitiesService = {
 
     const existingMembership = await communitiesRepository.getMembership(
       communityId,
-      userId
+      userId,
     );
 
     if (existingMembership) {
@@ -59,7 +55,7 @@ const communitiesService = {
         communityId,
         userId,
         "member",
-        { transaction }
+        { transaction },
       );
 
       await communitiesRepository.incrementMembersCount(communityId, {
@@ -73,7 +69,7 @@ const communitiesService = {
   async leaveCommunity(communityId, userId) {
     const membership = await communitiesRepository.getMembership(
       communityId,
-      userId
+      userId,
     );
 
     if (!membership) {

@@ -1,5 +1,5 @@
 import blocksRepository from "../repositories/blocks.repository.js";
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/apierror.js";
 
 const blocksService = {
   async blockUser(blockerId, blockedId) {
@@ -14,7 +14,7 @@ const blocksService = {
 
     const existingBlock = await blocksRepository.findBlock(
       blockerId,
-      blockedId
+      blockedId,
     );
     if (existingBlock) {
       throw new ApiError(409, "You have already blocked this user");
@@ -26,7 +26,7 @@ const blocksService = {
   async unblockUser(blockerId, blockedId) {
     const existingBlock = await blocksRepository.findBlock(
       blockerId,
-      blockedId
+      blockedId,
     );
     if (!existingBlock) {
       throw new ApiError(404, "You have not blocked this user");

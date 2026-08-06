@@ -1,7 +1,7 @@
 import communitiesService from "../services/communities.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiResponse from "../utils/ApiResponse.js";
-import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asynchandler.js";
+import ApiResponse from "../utils/apiresponse.js";
+import ApiError from "../utils/apierror.js";
 
 const communitiesController = {
   // GET /communities?state=Lagos&lga=Ikeja
@@ -9,16 +9,17 @@ const communitiesController = {
     const { state, lga } = req.query;
 
     if (!state || !lga) {
-      throw new ApiError(400, "Query parameters 'state' and 'lga' are required.");
+      throw new ApiError(
+        400,
+        "Query parameters 'state' and 'lga' are required.",
+      );
     }
 
     const community = await communitiesService.getByStateAndLga(state, lga);
 
     res
       .status(200)
-      .json(
-        new ApiResponse(200, community, "Community fetched successfully")
-      );
+      .json(new ApiResponse(200, community, "Community fetched successfully"));
   }),
 
   // GET /communities/:communityId
@@ -33,8 +34,8 @@ const communitiesController = {
         new ApiResponse(
           200,
           community,
-          "Community details fetched successfully"
-        )
+          "Community details fetched successfully",
+        ),
       );
   }),
 
@@ -52,7 +53,7 @@ const communitiesController = {
     res
       .status(200)
       .json(
-        new ApiResponse(200, result, "Community members fetched successfully")
+        new ApiResponse(200, result, "Community members fetched successfully"),
       );
   }),
 
@@ -63,7 +64,7 @@ const communitiesController = {
 
     const membership = await communitiesService.joinCommunity(
       communityId,
-      userId
+      userId,
     );
 
     res
