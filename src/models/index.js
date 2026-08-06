@@ -8,11 +8,11 @@ import Property from "./property.js";
 import Admin from "./admin.js";
 import defineCommunity from "./community.model.js";
 import defineCommunityMember from "./communityMember.model.js";
-import definePost from "./post.model.js";
+import definePost from "./Post.model.js";
 import defineComment from "./comment.model.js";
 import defineAnnouncement from "./announcement.model.js";
-import defineGroup from "./group.model.js";
-import defineGroupMember from "./groupMember.model.js";
+import defineGroup from "./Group.model.js";
+import defineGroupMember from "./Groupmember.model.js";
 import defineMessage from "./message.model.js";
 import defineBlock from "./block.model.js";
 
