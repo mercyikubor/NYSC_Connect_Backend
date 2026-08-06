@@ -22,8 +22,6 @@ export const extractCallUpDetails = async (req, res) => {
       extractedData: extractedData,
     });
   } catch (error) {
-    console.error("Error processing Call-Up Letter:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Failed to process Call-Up Letter.",

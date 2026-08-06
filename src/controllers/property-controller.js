@@ -221,7 +221,7 @@ export const deleteProperty = async (req, res) => {
     ) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized",
+        message: "Unauthorized to delete this property",
       });
     }
 
@@ -285,9 +285,7 @@ export const verifyProperty = async (req, res) => {
       data: property,
     });
   } catch (error) {
-    console.error("========== CREATE PROPERTY ERROR ==========");
     console.error(error);
-    console.error("===========================================");
 
     return res.status(500).json({
       success: false,
@@ -311,13 +309,7 @@ export const getMyProperties = async (req, res) => {
       data: properties,
     });
   } catch (error) {
-    console.log("========== ERROR ==========");
     console.error(error);
-    console.log("Error message:", error.message);
-    console.log("Error name:", error.name);
-    console.log("Validation errors:", error.errors);
-    console.log("===========================");
-
     return res.status(500).json({
       success: false,
       error: error.message,

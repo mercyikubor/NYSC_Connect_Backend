@@ -15,8 +15,20 @@ import { validateUpdateCorpProfile } from "../validators/corps-validators.js";
 
 const router = Router();
 
-//Admin Routes
 router.get("/", authenticateUser, authorizeRoles("Admin"), getAllCorpProfiles);
+router.get(
+  "/profile",
+  authenticateUser,
+  authorizeRoles("Corps_members"),
+  getCorpProfile,
+);
+router.put(
+  "/profile",
+  authenticateUser,
+  authorizeRoles("Corps_members"),
+  validateUpdateCorpProfile,
+  updateCorpProfile,
+);
 router.get(
   "/:id",
   authenticateUser,
@@ -35,14 +47,6 @@ router.delete(
   authenticateUser,
   authorizeRoles("Admin"),
   deleteCorpProfileByAdmin,
-);
-// corps member routes
-router.get("/profile", authenticateUser, getCorpProfile);
-router.put(
-  "/profile",
-  authenticateUser,
-  validateUpdateCorpProfile,
-  updateCorpProfile,
 );
 
 export default router;

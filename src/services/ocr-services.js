@@ -20,7 +20,6 @@ export const extractTextFromImage = async (fileUrl) => {
     );
     return response.data;
   } catch (error) {
-    console.error(error.response?.data || error.message);
     throw new Error("Failed to extract text from image");
   }
 };
