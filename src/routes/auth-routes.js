@@ -1,4 +1,3 @@
-import express from "express";
 import {
   registerCorpsMemberController,
   verifyEmailController,
@@ -27,6 +26,8 @@ import {
   authenticateUser,
   authorizeRoles,
 } from "../middleware/auth-middleware.js";
+import express from "express";
+// import { upload } from "../config/cloudinary.js";
 
 const router = express.Router();
 
@@ -67,7 +68,6 @@ router.post(
   resetPasswordController,
 );
 
-//Only corps members
 router.get(
   "/corps-dashboard",
   authenticateUser,
@@ -80,7 +80,6 @@ router.get(
   },
 );
 
-// Only landlords
 router.get(
   "/landlord-dashboard",
   authenticateUser,

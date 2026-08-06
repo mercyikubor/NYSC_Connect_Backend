@@ -2,7 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
-import path from "path";
+
 dotenv.config();
 
 cloudinary.config({
@@ -11,18 +11,49 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+// =========================
+// Call-up Letter Storage
+// =========================
+const callUpLetterStorage = new CloudinaryStorage({
+  cloudinary,
   params: {
-    folder: "nysc-connect/business-storefronts",
+    folder: "call_up_letters",
+    allowed_formats: ["pdf", "jpg", "jpeg", "png"],
+  },
+});
+
+// =========================
+// Landlord Verification Storage
+// =========================
+const landlordStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "nysc-connect/landlord-verification",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
     transformation: [
-      { width: 600, height: 400, crop: "limit", quality: "auto" },
+      {
+        width: 600,
+        height: 400,
+        crop: "limit",
+        quality: "auto",
+      },
     ],
   },
 });
 
-export const uploadImage = multer({
-  storage,
-  limits: { fileSize: 3 * 1024 * 1024 },
+const uploadCallUpLetter = multer({
+  storage: callUpLetterStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+}).single("callUpLetter");
+
+const upload = multer({
+  storage: landlordStorage,
+  limits: {
+    fileSize: 3 * 1024 * 1024,
+  },
 });
+
+export { cloudinary, upload, uploadCallUpLetter };
+export default cloudinary;

@@ -1,42 +1,28 @@
-class SmsService {
-  async sendSMS(phone, message) {
+import dotenv from 'dotenv';
+import twilio from 'twilio';
+
+dotenv.config();
+
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+   process.env.TWILIO_AUTH_TOKEN
+  );
+
+  async function sendSMS(to, message) {
     try {
-      const response = await fetch(
-        "https://api.ng.termii.com/api/sms/send",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            api_key: process.env.TERMII_API_KEY,
-            to: phone,
-            from: "NYSCAPP",
-            sms: message,
-            type: "plain",
-            channel: "generic",
-          }),
-        }
-      );
+      const response = await client.messages.create({
+        body: `Your NYSC Connect verification code is: ${message}. This code expires in 5 minutes. Please do not share this code with anyone.`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: to,
+      });
+      console.log('SMS sent successfully:', response.sid);
+      console.log('Message SID:', response.sid);
 
-      const data = await response.json();
-
-      return {
-        success: true,
-        data,
-      };
+      return response.sid;
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      console.error('Error sending SMS:', error.message);
+      throw error;
     }
   }
-
-  async sendOTP(phone, otp) {
-    const message = `Your NYSC verification code is ${otp}. Do not share it with anyone.`;
-    return this.sendSMS(phone, message);
-  }
-}
-
-export default new SmsService();
+  
+  export default { sendSMS };

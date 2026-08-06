@@ -210,6 +210,7 @@ export const requestPasswordReset = async (data) => {
   const user = await User.findOne({
     where: { email },
   });
+
   if (!user) {
     throw new Error("User not found.");
   }
@@ -231,6 +232,7 @@ export const requestPasswordReset = async (data) => {
   if (!emailResult.success) {
     throw new Error("Failed to send password reset email.");
   }
+
   return {
     success: true,
     message: "Password reset OTP sent successfully.",

@@ -1,14 +1,17 @@
 import { Router } from "express";
 import {
   getAllCorpProfiles,
+  getSingleCorpProfileByAdmin,
+  updateCorpProfileByAdmin,
+  deleteCorpProfileByAdmin,
   getCorpProfile,
   updateCorpProfile,
-  deleteCorpProfile,
 } from "../controllers/corp-controller.js";
 import {
   authenticateUser,
   authorizeRoles,
 } from "../middleware/auth-middleware.js";
+import { validateUpdateCorpProfile } from "../validators/corps-validators.js";
 
 const router = Router();
 
@@ -23,13 +26,27 @@ router.put(
   "/profile",
   authenticateUser,
   authorizeRoles("Corps_members"),
+  validateUpdateCorpProfile,
   updateCorpProfile,
 );
-router.delete(
-  "/profile",
+router.get(
+  "/:id",
   authenticateUser,
-  authorizeRoles("Corps_members"),
-  deleteCorpProfile,
+  authorizeRoles("Admin"),
+  getSingleCorpProfileByAdmin,
+);
+router.put(
+  "/:id",
+  authenticateUser,
+  authorizeRoles("Admin"),
+  validateUpdateCorpProfile,
+  updateCorpProfileByAdmin,
+);
+router.delete(
+  "/:id",
+  authenticateUser,
+  authorizeRoles("Admin"),
+  deleteCorpProfileByAdmin,
 );
 
 export default router;
