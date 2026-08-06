@@ -18,9 +18,14 @@ export const createProperty = async (req, res) => {
       state: req.body.state,
       lga: req.body.lga,
       address: req.body.address,
-      landlordId: req.user.userId,
+
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+
+      landlordId: req.user.landlordId,
+
       images,
-      verificationStatus: "pending",
+      verificationStatus: "PENDING",
     });
 
     return res.status(201).json({
@@ -154,7 +159,7 @@ export const updateProperty = async (req, res) => {
       });
     }
 
-    if (property.landlordId !== req.user.userId) {
+    if (property.landlordId !== req.user.landlordId) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized",
@@ -168,6 +173,8 @@ export const updateProperty = async (req, res) => {
       "address",
       "state",
       "lga",
+      "latitude",
+      "longitude",
     ];
 
     const hasCoreUpdate = resetFields.some(
@@ -179,7 +186,8 @@ export const updateProperty = async (req, res) => {
     };
 
     if (hasCoreUpdate) {
-      updateData.verificationStatus = "pending";
+      updateData.verificationStatus = "PENDING";
+      updateData.rejectionReason = null;
     }
 
     await property.update(updateData);
@@ -207,7 +215,10 @@ export const deleteProperty = async (req, res) => {
       });
     }
 
-    if (property.landlordId !== req.user.userId && req.user.role !== "Admin") {
+    if (
+      property.landlordId !== req.user.landlordId &&
+      req.user.role !== "Admin"
+    ) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized",
@@ -229,6 +240,13 @@ export const deleteProperty = async (req, res) => {
       message: "Property deleted successfully",
     });
   } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -238,13 +256,9 @@ export const deleteProperty = async (req, res) => {
 
 export const verifyProperty = async (req, res) => {
   try {
-    console.log("Request Body:", req.body);
-
     const { status, rejectionReason } = req.body;
 
-    console.log("Status:", status);
-
-    if (!["approved", "rejected"].includes(status)) {
+    if (!["APPROVED", "REJECTED"].includes(status)) {
       return res.status(400).json({
         success: false,
         message: "Invalid status",
@@ -263,7 +277,7 @@ export const verifyProperty = async (req, res) => {
     await property.update({
       verificationStatus: status,
       rejectionReason:
-        status === "rejected" ? rejectionReason || "Failed verification" : null,
+        status === "REJECTED" ? rejectionReason || "Failed verification" : null,
     });
 
     return res.status(200).json({
@@ -271,7 +285,9 @@ export const verifyProperty = async (req, res) => {
       data: property,
     });
   } catch (error) {
+    console.error("========== CREATE PROPERTY ERROR ==========");
     console.error(error);
+    console.error("===========================================");
 
     return res.status(500).json({
       success: false,
@@ -284,7 +300,7 @@ export const getMyProperties = async (req, res) => {
   try {
     const properties = await Property.findAll({
       where: {
-        landlordId: req.user.userId,
+        landlordId: req.user.landlordId,
       },
       order: [["createdAt", "DESC"]],
     });
@@ -295,6 +311,13 @@ export const getMyProperties = async (req, res) => {
       data: properties,
     });
   } catch (error) {
+    console.log("========== ERROR ==========");
+    console.error(error);
+    console.log("Error message:", error.message);
+    console.log("Error name:", error.name);
+    console.log("Validation errors:", error.errors);
+    console.log("===========================");
+
     return res.status(500).json({
       success: false,
       error: error.message,

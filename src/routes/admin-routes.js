@@ -9,6 +9,8 @@ import {
   verifyProperty,
   getAllLandlords,
   getDashboardStats,
+  approveLandlord,
+  rejectLandlord,
 } from "../controllers/admin-controller.js";
 
 const router = express.Router();
@@ -16,12 +18,16 @@ const router = express.Router();
 router.use(authenticateUser);
 router.use(authorizeRoles("Admin"));
 
+router.get("/landlords", getAllLandlords);
+
 router.get("/dashboard", getDashboardStats);
 
 router.get("/properties", getAllProperties);
 
 router.patch("/properties/:id/verify", verifyProperty);
 
-router.get("/landlords", getAllLandlords);
+router.patch("/landlords/:id/approve", approveLandlord);
+
+router.patch("/landlords/:id/reject", rejectLandlord);
 
 export default router;

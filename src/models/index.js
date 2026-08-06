@@ -5,6 +5,7 @@ import State from "./state.js";
 import LGA from "./lga.js";
 import Landlord from "./landlord.js";
 import Property from "./property.js";
+import Admin from "./admin.js";
 
 // User -> CorpsMember Association (One-to-One)
 User.hasOne(CorpsMember, {
@@ -62,4 +63,4 @@ Property.belongsTo(Landlord, {
   foreignKey: "landlordId",
   as: "landlord",
 });
-export { sequelize, User, CorpsMember, State, LGA, Landlord, Property };
+export { sequelize, User, CorpsMember, State, LGA, Landlord, Property, Admin };

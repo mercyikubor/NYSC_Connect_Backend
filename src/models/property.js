@@ -49,14 +49,24 @@ const Property = sequelize.define(
       allowNull: false,
     },
 
+    latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      allowNull: false,
+    },
+
+    longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      allowNull: false,
+    },
+
     isAvailable: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
 
     verificationStatus: {
-      type: DataTypes.ENUM("pending", "approved", "rejected"),
-      defaultValue: "pending",
+      type: DataTypes.ENUM("PENDING", "APPROVED", "REJECTED"),
+      defaultValue: "PENDING",
     },
 
     rejectionReason: {
@@ -86,7 +96,7 @@ const Property = sequelize.define(
         fields: ["price"],
       },
     ],
-  }
+  },
 );
 
 export default Property;

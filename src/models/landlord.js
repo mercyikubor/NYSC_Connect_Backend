@@ -1,8 +1,9 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js";
 
-const Landlord = sequelize.define('Landlord', {
-    id: {
+const Landlord = sequelize.define("Landlord", {
+  //Basic Information
+  id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
@@ -25,6 +26,8 @@ const Landlord = sequelize.define('Landlord', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+
+  // Verification Information
   selfieUrl: {
     type: DataTypes.TEXT,
     allowNull: false,
@@ -33,13 +36,50 @@ const Landlord = sequelize.define('Landlord', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  isVerified: {
+
+  // Identity verification
+  verificationStatus: {
+    type: DataTypes.ENUM("PENDING", "APPROVED", "REJECTED"),
+    defaultValue: "PENDING",
+  },
+  rejectionReason: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  isIdentityVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
-  verificationStatus: {
-    type: DataTypes.ENUM('PENDING', 'APPROVED', 'REJECTED'),
-    defaultValue: 'PENDING',
+
+  verifiedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  // Email verification
+  emailVerificationOtp: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
+  emailVerificationOtpExpiresAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+
+  isEmailVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+
+  // Password reset
+  passwordResetOtp: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
+  passwordResetOtpExpiresAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
 });
 

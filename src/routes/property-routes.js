@@ -18,8 +18,8 @@ const router = express.Router();
 router.get(
   "/my-properties",
   authenticateUser,
-  authorizeRoles("Landlords"),
-  getMyProperties
+  authorizeRoles("Landlord"),
+  getMyProperties,
 );
 
 router.get("/", getProperties);
@@ -29,30 +29,30 @@ router.get("/:id", getPropertyById);
 router.post(
   "/",
   authenticateUser,
-  authorizeRoles("Landlords"),
+  authorizeRoles("Landlord"),
   upload.array("images", 5),
-  createProperty
+  createProperty,
 );
 
 router.put(
   "/:id",
   authenticateUser,
-  authorizeRoles("Landlords"),
-  updateProperty
+  authorizeRoles("Landlord"),
+  updateProperty,
 );
 
 router.delete(
   "/:id",
   authenticateUser,
-  authorizeRoles("Landlords"),
-  deleteProperty
+  authorizeRoles("Landlord"),
+  deleteProperty,
 );
 
 router.patch(
   "/:id/verify",
   authenticateUser,
   authorizeRoles("Admin"),
-  verifyProperty
+  verifyProperty,
 );
 
 export default router;

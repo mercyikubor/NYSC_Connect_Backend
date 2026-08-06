@@ -30,10 +30,10 @@ export const verifyProperty = async (req, res) => {
   try {
     const { status, rejectionReason } = req.body;
 
-    if (!["approved", "rejected"].includes(status)) {
+    if (!["APPROVED", "REJECTED"].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Status must be 'approved' or 'rejected'",
+        message: "Status must be 'APPROVED' or 'REJECTED'",
       });
     }
 
@@ -49,9 +49,7 @@ export const verifyProperty = async (req, res) => {
     await property.update({
       verificationStatus: status,
       rejectionReason:
-        status === "rejected"
-          ? rejectionReason || "Property rejected"
-          : null,
+        status === "REJECTED" ? rejectionReason || "Property rejected" : null,
     });
 
     return res.status(200).json({
@@ -88,17 +86,75 @@ export const getAllLandlords = async (req, res) => {
   }
 };
 
+export const approveLandlord = async (req, res) => {
+  try {
+    const landlord = await Landlord.findByPk(req.params.id);
+
+    if (!landlord) {
+      return res.status(404).json({
+        success: false,
+        message: "Landlord not found",
+      });
+    }
+
+    await landlord.update({
+      verificationStatus: "APPROVED",
+      isVerified: true,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Landlord approved successfully",
+      data: landlord,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+export const rejectLandlord = async (req, res) => {
+  try {
+    const landlord = await Landlord.findByPk(req.params.id);
+
+    if (!landlord) {
+      return res.status(404).json({
+        success: false,
+        message: "Landlord not found",
+      });
+    }
+
+    await landlord.update({
+      verificationStatus: "REJECTED",
+      isVerified: false,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Landlord rejected successfully",
+      data: landlord,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
 export const getDashboardStats = async (req, res) => {
   try {
     const totalProperties = await Property.count();
     const pending = await Property.count({
-      where: { verificationStatus: "pending" },
+      where: { verificationStatus: "PENDING" },
     });
     const approved = await Property.count({
-      where: { verificationStatus: "approved" },
+      where: { verificationStatus: "APPROVED" },
     });
     const rejected = await Property.count({
-      where: { verificationStatus: "rejected" },
+      where: { verificationStatus: "REJECTED" },
     });
     const landlords = await Landlord.count();
 
