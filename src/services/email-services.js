@@ -1,38 +1,24 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT),
-  secure: process.env.SMTP_PORT === "465",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("Email service configuration error:", error);
-  } else {
-    console.log("Email service is ready to deliver secure messages");
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (to, subject, htmlContent) => {
   try {
-    const mailOptions = {
+    const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM,
-      to,
+      to: [to],
       subject,
       html: htmlContent,
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email successfuly sent to [${to}]. ID: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    if (error) {
+      throw new Error(error.message);
+    }
+    console.log(`Email successfully sent to [${to}]. ID: ${data.id}`);
+    return { success: true, messageId: data.id };
   } catch (error) {
     console.error(`Email failed to deliver to [${to}]:`, error);
     return { success: false, error: error.message };
